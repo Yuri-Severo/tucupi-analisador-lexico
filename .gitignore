@@ -1,0 +1,25 @@
+# artefatos de compilacao
+out/
+target/
+*.class
+
+# ferramenta baixada pelo build (nao versionar binarios)
+ferramentas/
+*.jar
+*.tar.gz
+
+# apresentacao e slides (nao versionar)
+docs/slides/
+ANTES-DE-ENTREGAR.md
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+
+# sistema
+.DS_Store
+Thumbs.db

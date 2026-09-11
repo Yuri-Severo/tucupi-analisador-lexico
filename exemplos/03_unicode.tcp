@@ -1,0 +1,38 @@
+// ---------------------------------------------------------------------
+// 03_unicode.tcp -- suporte a Unicode, a principal diferenca do JFlex
+// em relacao ao Flex/JLex.
+//
+// A diretiva %unicode faz o alfabeto do automato cobrir todo o intervalo
+// U+0000..U+10FFFF. As classes [:jletter:] e [:jletterdigit:] usam
+// Character.isJavaIdentifierStart/Part, entao identificadores acentuados
+// sao reconhecidos sem nenhuma regra adicional.
+// ---------------------------------------------------------------------
+
+programa AnáliseDeVazão;
+
+var vazão_média    : real = 3.75;
+var pressão_máxima : real = 101.325;
+var temperatura_ºC : real = 27.5;
+var índice         : inteiro = 0;
+var coeficienteΔ   : real = 0.015;
+var σ_amostral     : real = 1.28;
+
+// Literais de texto com caracteres fora do ASCII e escapes unicode.
+var unidade  : texto = "m³/s";
+var grau     : texto = "27,5 °C";
+var micro    : texto = "µm";     // U+00B5 MICRO SIGN
+var emoji    : texto = "medição ok";
+var simbolo  : caractere = 'Ω';  // U+03A9 GREEK CAPITAL LETTER OMEGA
+
+funcao razãoDeAspecto(largura: real, altura: real) -> real {
+  se (altura == 0.0) { retorne 0.0; }
+  retorne largura / altura;
+}
+
+funcao principal() -> inteiro {
+  índice = índice + 1;
+  vazão_média = razãoDeAspecto(pressão_máxima, temperatura_ºC);
+  escreva("vazão média: ", vazão_média, " ", unidade);
+  escreva("desvio σ = ", σ_amostral, " ", micro);
+  retorne 0;
+}

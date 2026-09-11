@@ -1,0 +1,400 @@
+==========================================================================
+ ANALISADOR LEXICO TUCUPI -- gerado com JFlex 1.9.1
+ Arquivo: exemplos/01_valido.tcp
+==========================================================================
+
+TABELA DE TOKENS
++--------+------+------+----------------------+----------------------------+----------------------+
+| #      | LIN  | COL  | LEXEMA               | TOKEN                      | VALOR                |
++--------+------+------+----------------------+----------------------------+----------------------+
+| 1      |    6 |    1 | programa             | PR_PROGRAMA                | -                    |
+| 2      |    6 |   10 | MonitorDeVazao       | IDENTIFICADOR              | MonitorDeVazao       |
+| 3      |    6 |   24 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 4      |   14 |    1 | constante            | PR_CONSTANTE               | -                    |
+| 5      |   14 |   11 | MASCARA_SENSOR       | IDENTIFICADOR              | MASCARA_SENSOR       |
+| 6      |   14 |   26 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 7      |   14 |   28 | inteiro              | PR_INTEIRO                 | -                    |
+| 8      |   14 |   36 | =                    | OP_ATRIBUI                 | -                    |
+| 9      |   14 |   38 | 0xFF00               | LIT_INTEIRO                | 65280                |
+| 10     |   14 |   44 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 11     |   15 |    1 | constante            | PR_CONSTANTE               | -                    |
+| 12     |   15 |   11 | BITS_ATIVOS          | IDENTIFICADOR              | BITS_ATIVOS          |
+| 13     |   15 |   26 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 14     |   15 |   28 | inteiro              | PR_INTEIRO                 | -                    |
+| 15     |   15 |   36 | =                    | OP_ATRIBUI                 | -                    |
+| 16     |   15 |   38 | 0b1010_1100          | LIT_INTEIRO                | 172                  |
+| 17     |   15 |   49 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 18     |   16 |    1 | constante            | PR_CONSTANTE               | -                    |
+| 19     |   16 |   11 | LIMITE               | IDENTIFICADOR              | LIMITE               |
+| 20     |   16 |   26 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 21     |   16 |   28 | inteiro              | PR_INTEIRO                 | -                    |
+| 22     |   16 |   36 | =                    | OP_ATRIBUI                 | -                    |
+| 23     |   16 |   38 | 1_000_000            | LIT_INTEIRO                | 1000000              |
+| 24     |   16 |   47 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 25     |   17 |    1 | constante            | PR_CONSTANTE               | -                    |
+| 26     |   17 |   11 | GRAVIDADE            | IDENTIFICADOR              | GRAVIDADE            |
+| 27     |   17 |   26 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 28     |   17 |   28 | real                 | PR_REAL                    | -                    |
+| 29     |   17 |   36 | =                    | OP_ATRIBUI                 | -                    |
+| 30     |   17 |   38 | 9.80665              | LIT_REAL                   | 9.80665              |
+| 31     |   17 |   45 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 32     |   18 |    1 | constante            | PR_CONSTANTE               | -                    |
+| 33     |   18 |   11 | EPSILON              | IDENTIFICADOR              | EPSILON              |
+| 34     |   18 |   26 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 35     |   18 |   28 | real                 | PR_REAL                    | -                    |
+| 36     |   18 |   36 | =                    | OP_ATRIBUI                 | -                    |
+| 37     |   18 |   38 | 1.0e-9               | LIT_REAL                   | 1.0E-9               |
+| 38     |   18 |   44 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 39     |   19 |    1 | constante            | PR_CONSTANTE               | -                    |
+| 40     |   19 |   11 | ESCALA               | IDENTIFICADOR              | ESCALA               |
+| 41     |   19 |   26 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 42     |   19 |   28 | real                 | PR_REAL                    | -                    |
+| 43     |   19 |   36 | =                    | OP_ATRIBUI                 | -                    |
+| 44     |   19 |   38 | 2.                   | LIT_REAL                   | 2.0                  |
+| 45     |   19 |   40 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 46     |   21 |    1 | var                  | PR_VAR                     | -                    |
+| 47     |   21 |    5 | leituras             | IDENTIFICADOR              | leituras             |
+| 48     |   21 |   16 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 49     |   21 |   18 | inteiro              | PR_INTEIRO                 | -                    |
+| 50     |   21 |   26 | =                    | OP_ATRIBUI                 | -                    |
+| 51     |   21 |   28 | 0                    | LIT_INTEIRO                | 0                    |
+| 52     |   21 |   29 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 53     |   22 |    1 | var                  | PR_VAR                     | -                    |
+| 54     |   22 |    5 | vazao                | IDENTIFICADOR              | vazao                |
+| 55     |   22 |   16 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 56     |   22 |   18 | real                 | PR_REAL                    | -                    |
+| 57     |   22 |   26 | =                    | OP_ATRIBUI                 | -                    |
+| 58     |   22 |   28 | 0.0                  | LIT_REAL                   | 0.0                  |
+| 59     |   22 |   31 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 60     |   23 |    1 | var                  | PR_VAR                     | -                    |
+| 61     |   23 |    5 | etiqueta             | IDENTIFICADOR              | etiqueta             |
+| 62     |   23 |   16 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 63     |   23 |   18 | texto                | PR_TEXTO                   | -                    |
+| 64     |   23 |   26 | =                    | OP_ATRIBUI                 | -                    |
+| 65     |   23 |   28 | "sensor "P-01"\tlin~ | LIT_TEXTO                  | sensor "P-01"\tlinh~ |
+| 66     |   23 |   56 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 67     |   24 |    1 | var                  | PR_VAR                     | -                    |
+| 68     |   24 |    5 | separador            | IDENTIFICADOR              | separador            |
+| 69     |   24 |   16 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 70     |   24 |   18 | caractere            | PR_CARACTERE               | -                    |
+| 71     |   24 |   28 | =                    | OP_ATRIBUI                 | -                    |
+| 72     |   24 |   30 | '\n'                 | LIT_CARACTERE              | \n                   |
+| 73     |   24 |   34 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 74     |   25 |    1 | var                  | PR_VAR                     | -                    |
+| 75     |   25 |    5 | simbolo              | IDENTIFICADOR              | simbolo              |
+| 76     |   25 |   16 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 77     |   25 |   18 | caractere            | PR_CARACTERE               | -                    |
+| 78     |   25 |   28 | =                    | OP_ATRIBUI                 | -                    |
+| 79     |   25 |   30 | 'µ'                  | LIT_CARACTERE              | µ                    |
+| 80     |   25 |   33 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 81     |   26 |    1 | var                  | PR_VAR                     | -                    |
+| 82     |   26 |    5 | ativo                | IDENTIFICADOR              | ativo                |
+| 83     |   26 |   16 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 84     |   26 |   18 | logico               | PR_LOGICO                  | -                    |
+| 85     |   26 |   26 | =                    | OP_ATRIBUI                 | -                    |
+| 86     |   26 |   28 | verdadeiro           | LIT_LOGICO                 | true                 |
+| 87     |   26 |   38 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 88     |   27 |    1 | var                  | PR_VAR                     | -                    |
+| 89     |   27 |    5 | desligado            | IDENTIFICADOR              | desligado            |
+| 90     |   27 |   16 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 91     |   27 |   18 | logico               | PR_LOGICO                  | -                    |
+| 92     |   27 |   26 | =                    | OP_ATRIBUI                 | -                    |
+| 93     |   27 |   28 | falso                | LIT_LOGICO                 | false                |
+| 94     |   27 |   33 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 95     |   28 |    1 | var                  | PR_VAR                     | -                    |
+| 96     |   28 |    5 | reserva              | IDENTIFICADOR              | reserva              |
+| 97     |   28 |   26 | =                    | OP_ATRIBUI                 | -                    |
+| 98     |   28 |   28 | nulo                 | PR_NULO                    | -                    |
+| 99     |   28 |   32 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 100    |   30 |    1 | funcao               | PR_FUNCAO                  | -                    |
+| 101    |   30 |    8 | media                | IDENTIFICADOR              | media                |
+| 102    |   30 |   13 | (                    | DEL_ABRE_PAR               | -                    |
+| 103    |   30 |   14 | soma                 | IDENTIFICADOR              | soma                 |
+| 104    |   30 |   18 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 105    |   30 |   20 | real                 | PR_REAL                    | -                    |
+| 106    |   30 |   24 | ,                    | DEL_VIRGULA                | -                    |
+| 107    |   30 |   26 | n                    | IDENTIFICADOR              | n                    |
+| 108    |   30 |   27 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 109    |   30 |   29 | inteiro              | PR_INTEIRO                 | -                    |
+| 110    |   30 |   36 | )                    | DEL_FECHA_PAR              | -                    |
+| 111    |   30 |   38 | ->                   | OP_SETA                    | -                    |
+| 112    |   30 |   41 | real                 | PR_REAL                    | -                    |
+| 113    |   30 |   46 | {                    | DEL_ABRE_CHA               | -                    |
+| 114    |   31 |    3 | se                   | PR_SE                      | -                    |
+| 115    |   31 |    6 | (                    | DEL_ABRE_PAR               | -                    |
+| 116    |   31 |    7 | n                    | IDENTIFICADOR              | n                    |
+| 117    |   31 |    9 | ==                   | OP_IGUAL                   | -                    |
+| 118    |   31 |   12 | 0                    | LIT_INTEIRO                | 0                    |
+| 119    |   31 |   13 | )                    | DEL_FECHA_PAR              | -                    |
+| 120    |   31 |   15 | {                    | DEL_ABRE_CHA               | -                    |
+| 121    |   32 |    5 | retorne              | PR_RETORNE                 | -                    |
+| 122    |   32 |   13 | 0.0                  | LIT_REAL                   | 0.0                  |
+| 123    |   32 |   16 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 124    |   33 |    3 | }                    | DEL_FECHA_CHA              | -                    |
+| 125    |   34 |    3 | retorne              | PR_RETORNE                 | -                    |
+| 126    |   34 |   11 | soma                 | IDENTIFICADOR              | soma                 |
+| 127    |   34 |   16 | /                    | OP_DIVIDE                  | -                    |
+| 128    |   34 |   18 | n                    | IDENTIFICADOR              | n                    |
+| 129    |   34 |   19 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 130    |   35 |    1 | }                    | DEL_FECHA_CHA              | -                    |
+| 131    |   37 |    1 | funcao               | PR_FUNCAO                  | -                    |
+| 132    |   37 |    8 | classificar          | IDENTIFICADOR              | classificar          |
+| 133    |   37 |   19 | (                    | DEL_ABRE_PAR               | -                    |
+| 134    |   37 |   20 | v                    | IDENTIFICADOR              | v                    |
+| 135    |   37 |   21 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 136    |   37 |   23 | real                 | PR_REAL                    | -                    |
+| 137    |   37 |   27 | )                    | DEL_FECHA_PAR              | -                    |
+| 138    |   37 |   29 | ->                   | OP_SETA                    | -                    |
+| 139    |   37 |   32 | texto                | PR_TEXTO                   | -                    |
+| 140    |   37 |   38 | {                    | DEL_ABRE_CHA               | -                    |
+| 141    |   38 |    3 | se                   | PR_SE                      | -                    |
+| 142    |   38 |    6 | (                    | DEL_ABRE_PAR               | -                    |
+| 143    |   38 |    7 | v                    | IDENTIFICADOR              | v                    |
+| 144    |   38 |    9 | <                    | OP_MENOR                   | -                    |
+| 145    |   38 |   11 | 1.5                  | LIT_REAL                   | 1.5                  |
+| 146    |   38 |   14 | )                    | DEL_FECHA_PAR              | -                    |
+| 147    |   38 |   23 | {                    | DEL_ABRE_CHA               | -                    |
+| 148    |   38 |   25 | retorne              | PR_RETORNE                 | -                    |
+| 149    |   38 |   33 | "baixa"              | LIT_TEXTO                  | baixa                |
+| 150    |   38 |   40 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 151    |   38 |   43 | }                    | DEL_FECHA_CHA              | -                    |
+| 152    |   39 |    3 | senao                | PR_SENAO                   | -                    |
+| 153    |   39 |    9 | se                   | PR_SE                      | -                    |
+| 154    |   39 |   12 | (                    | DEL_ABRE_PAR               | -                    |
+| 155    |   39 |   13 | v                    | IDENTIFICADOR              | v                    |
+| 156    |   39 |   15 | <=                   | OP_MENOR_IGUAL             | -                    |
+| 157    |   39 |   18 | 4.0                  | LIT_REAL                   | 4.0                  |
+| 158    |   39 |   21 | )                    | DEL_FECHA_PAR              | -                    |
+| 159    |   39 |   23 | {                    | DEL_ABRE_CHA               | -                    |
+| 160    |   39 |   25 | retorne              | PR_RETORNE                 | -                    |
+| 161    |   39 |   33 | "normal"             | LIT_TEXTO                  | normal               |
+| 162    |   39 |   41 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 163    |   39 |   43 | }                    | DEL_FECHA_CHA              | -                    |
+| 164    |   40 |    3 | senao                | PR_SENAO                   | -                    |
+| 165    |   40 |   23 | {                    | DEL_ABRE_CHA               | -                    |
+| 166    |   40 |   25 | retorne              | PR_RETORNE                 | -                    |
+| 167    |   40 |   33 | "alta"               | LIT_TEXTO                  | alta                 |
+| 168    |   40 |   39 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 169    |   40 |   43 | }                    | DEL_FECHA_CHA              | -                    |
+| 170    |   41 |    1 | }                    | DEL_FECHA_CHA              | -                    |
+| 171    |   43 |    1 | funcao               | PR_FUNCAO                  | -                    |
+| 172    |   43 |    8 | principal            | IDENTIFICADOR              | principal            |
+| 173    |   43 |   17 | (                    | DEL_ABRE_PAR               | -                    |
+| 174    |   43 |   18 | )                    | DEL_FECHA_PAR              | -                    |
+| 175    |   43 |   20 | ->                   | OP_SETA                    | -                    |
+| 176    |   43 |   23 | inteiro              | PR_INTEIRO                 | -                    |
+| 177    |   43 |   31 | {                    | DEL_ABRE_CHA               | -                    |
+| 178    |   46 |    3 | para                 | PR_PARA                    | -                    |
+| 179    |   46 |    8 | i                    | IDENTIFICADOR              | i                    |
+| 180    |   46 |   10 | =                    | OP_ATRIBUI                 | -                    |
+| 181    |   46 |   12 | 1                    | LIT_INTEIRO                | 1                    |
+| 182    |   46 |   13 | ..                   | OP_INTERVALO               | -                    |
+| 183    |   46 |   15 | 10                   | LIT_INTEIRO                | 10                   |
+| 184    |   46 |   18 | passo                | PR_PASSO                   | -                    |
+| 185    |   46 |   24 | 1                    | LIT_INTEIRO                | 1                    |
+| 186    |   46 |   26 | {                    | DEL_ABRE_CHA               | -                    |
+| 187    |   47 |    5 | leituras             | IDENTIFICADOR              | leituras             |
+| 188    |   47 |   14 | +=                   | OP_MAIS_ATRIBUI            | -                    |
+| 189    |   47 |   17 | 1                    | LIT_INTEIRO                | 1                    |
+| 190    |   47 |   18 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 191    |   48 |    5 | vazao                | IDENTIFICADOR              | vazao                |
+| 192    |   48 |   11 | =                    | OP_ATRIBUI                 | -                    |
+| 193    |   48 |   13 | vazao                | IDENTIFICADOR              | vazao                |
+| 194    |   48 |   19 | +                    | OP_MAIS                    | -                    |
+| 195    |   48 |   21 | media                | IDENTIFICADOR              | media                |
+| 196    |   48 |   26 | (                    | DEL_ABRE_PAR               | -                    |
+| 197    |   48 |   27 | i                    | IDENTIFICADOR              | i                    |
+| 198    |   48 |   29 | *                    | OP_VEZES                   | -                    |
+| 199    |   48 |   31 | GRAVIDADE            | IDENTIFICADOR              | GRAVIDADE            |
+| 200    |   48 |   40 | ,                    | DEL_VIRGULA                | -                    |
+| 201    |   48 |   42 | leituras             | IDENTIFICADOR              | leituras             |
+| 202    |   48 |   50 | )                    | DEL_FECHA_PAR              | -                    |
+| 203    |   48 |   51 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 204    |   49 |    3 | }                    | DEL_FECHA_CHA              | -                    |
+| 205    |   53 |    3 | var                  | PR_VAR                     | -                    |
+| 206    |   53 |    7 | registro             | IDENTIFICADOR              | registro             |
+| 207    |   53 |   16 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 208    |   53 |   18 | inteiro              | PR_INTEIRO                 | -                    |
+| 209    |   53 |   26 | =                    | OP_ATRIBUI                 | -                    |
+| 210    |   53 |   28 | BITS_ATIVOS          | IDENTIFICADOR              | BITS_ATIVOS          |
+| 211    |   53 |   40 | <<                   | OP_DESLOCA_ESQ             | -                    |
+| 212    |   53 |   43 | 2                    | LIT_INTEIRO                | 2                    |
+| 213    |   53 |   44 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 214    |   54 |    3 | registro             | IDENTIFICADOR              | registro             |
+| 215    |   54 |   12 | <<=                  | OP_DESLOCA_ESQ_ATRIBUI     | -                    |
+| 216    |   54 |   16 | 1                    | LIT_INTEIRO                | 1                    |
+| 217    |   54 |   17 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 218    |   55 |    3 | registro             | IDENTIFICADOR              | registro             |
+| 219    |   55 |   12 | >>=                  | OP_DESLOCA_DIR_ATRIBUI     | -                    |
+| 220    |   55 |   16 | 1                    | LIT_INTEIRO                | 1                    |
+| 221    |   55 |   17 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 222    |   56 |    3 | se                   | PR_SE                      | -                    |
+| 223    |   56 |    6 | (                    | DEL_ABRE_PAR               | -                    |
+| 224    |   56 |    7 | registro             | IDENTIFICADOR              | registro             |
+| 225    |   56 |   16 | <                    | OP_MENOR                   | -                    |
+| 226    |   56 |   18 | LIMITE               | IDENTIFICADOR              | LIMITE               |
+| 227    |   56 |   25 | &&                   | OP_E_LOGICO                | -                    |
+| 228    |   56 |   28 | registro             | IDENTIFICADOR              | registro             |
+| 229    |   56 |   37 | <=                   | OP_MENOR_IGUAL             | -                    |
+| 230    |   56 |   40 | MASCARA_SENSOR       | IDENTIFICADOR              | MASCARA_SENSOR       |
+| 231    |   56 |   54 | )                    | DEL_FECHA_PAR              | -                    |
+| 232    |   56 |   56 | {                    | DEL_ABRE_CHA               | -                    |
+| 233    |   57 |    5 | registro             | IDENTIFICADOR              | registro             |
+| 234    |   57 |   14 | =                    | OP_ATRIBUI                 | -                    |
+| 235    |   57 |   16 | registro             | IDENTIFICADOR              | registro             |
+| 236    |   57 |   25 | >>                   | OP_DESLOCA_DIR             | -                    |
+| 237    |   57 |   28 | 3                    | LIT_INTEIRO                | 3                    |
+| 238    |   57 |   29 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 239    |   58 |    3 | }                    | DEL_FECHA_CHA              | -                    |
+| 240    |   60 |    3 | se                   | PR_SE                      | -                    |
+| 241    |   60 |    6 | (                    | DEL_ABRE_PAR               | -                    |
+| 242    |   60 |    7 | !                    | OP_NAO_LOGICO              | -                    |
+| 243    |   60 |    8 | desligado            | IDENTIFICADOR              | desligado            |
+| 244    |   60 |   18 | ||                   | OP_OU_LOGICO               | -                    |
+| 245    |   60 |   21 | ativo                | IDENTIFICADOR              | ativo                |
+| 246    |   60 |   26 | )                    | DEL_FECHA_PAR              | -                    |
+| 247    |   60 |   28 | {                    | DEL_ABRE_CHA               | -                    |
+| 248    |   61 |    5 | escreva              | PR_ESCREVA                 | -                    |
+| 249    |   61 |   12 | (                    | DEL_ABRE_PAR               | -                    |
+| 250    |   61 |   13 | "vazao media = "     | LIT_TEXTO                  | vazao media =        |
+| 251    |   61 |   29 | ,                    | DEL_VIRGULA                | -                    |
+| 252    |   61 |   31 | vazao                | IDENTIFICADOR              | vazao                |
+| 253    |   61 |   36 | ,                    | DEL_VIRGULA                | -                    |
+| 254    |   61 |   38 | separador            | IDENTIFICADOR              | separador            |
+| 255    |   61 |   47 | )                    | DEL_FECHA_PAR              | -                    |
+| 256    |   61 |   48 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 257    |   62 |    5 | escreva              | PR_ESCREVA                 | -                    |
+| 258    |   62 |   12 | (                    | DEL_ABRE_PAR               | -                    |
+| 259    |   62 |   13 | classificar          | IDENTIFICADOR              | classificar          |
+| 260    |   62 |   24 | (                    | DEL_ABRE_PAR               | -                    |
+| 261    |   62 |   25 | vazao                | IDENTIFICADOR              | vazao                |
+| 262    |   62 |   30 | )                    | DEL_FECHA_PAR              | -                    |
+| 263    |   62 |   31 | )                    | DEL_FECHA_PAR              | -                    |
+| 264    |   62 |   32 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 265    |   63 |    3 | }                    | DEL_FECHA_CHA              | -                    |
+| 266    |   65 |    3 | enquanto             | PR_ENQUANTO                | -                    |
+| 267    |   65 |   12 | (                    | DEL_ABRE_PAR               | -                    |
+| 268    |   65 |   13 | vazao                | IDENTIFICADOR              | vazao                |
+| 269    |   65 |   19 | >                    | OP_MAIOR                   | -                    |
+| 270    |   65 |   21 | EPSILON              | IDENTIFICADOR              | EPSILON              |
+| 271    |   65 |   28 | )                    | DEL_FECHA_PAR              | -                    |
+| 272    |   65 |   30 | {                    | DEL_ABRE_CHA               | -                    |
+| 273    |   66 |    5 | vazao                | IDENTIFICADOR              | vazao                |
+| 274    |   66 |   11 | *=                   | OP_VEZES_ATRIBUI           | -                    |
+| 275    |   66 |   14 | 0.5                  | LIT_REAL                   | 0.5                  |
+| 276    |   66 |   17 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 277    |   67 |    5 | se                   | PR_SE                      | -                    |
+| 278    |   67 |    8 | (                    | DEL_ABRE_PAR               | -                    |
+| 279    |   67 |    9 | vazao                | IDENTIFICADOR              | vazao                |
+| 280    |   67 |   15 | <                    | OP_MENOR                   | -                    |
+| 281    |   67 |   17 | EPSILON              | IDENTIFICADOR              | EPSILON              |
+| 282    |   67 |   24 | )                    | DEL_FECHA_PAR              | -                    |
+| 283    |   67 |   26 | {                    | DEL_ABRE_CHA               | -                    |
+| 284    |   67 |   28 | vazao                | IDENTIFICADOR              | vazao                |
+| 285    |   67 |   34 | =                    | OP_ATRIBUI                 | -                    |
+| 286    |   67 |   36 | 0.0                  | LIT_REAL                   | 0.0                  |
+| 287    |   67 |   39 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 288    |   67 |   41 | }                    | DEL_FECHA_CHA              | -                    |
+| 289    |   68 |    3 | }                    | DEL_FECHA_CHA              | -                    |
+| 290    |   70 |    3 | var                  | PR_VAR                     | -                    |
+| 291    |   70 |    7 | potencia             | IDENTIFICADOR              | potencia             |
+| 292    |   70 |   16 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 293    |   70 |   18 | real                 | PR_REAL                    | -                    |
+| 294    |   70 |   23 | =                    | OP_ATRIBUI                 | -                    |
+| 295    |   70 |   25 | 2.0                  | LIT_REAL                   | 2.0                  |
+| 296    |   70 |   29 | **                   | OP_POTENCIA                | -                    |
+| 297    |   70 |   32 | 10                   | LIT_INTEIRO                | 10                   |
+| 298    |   70 |   34 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 299    |   71 |    3 | var                  | PR_VAR                     | -                    |
+| 300    |   71 |    7 | resto                | IDENTIFICADOR              | resto                |
+| 301    |   71 |   16 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 302    |   71 |   18 | inteiro              | PR_INTEIRO                 | -                    |
+| 303    |   71 |   26 | =                    | OP_ATRIBUI                 | -                    |
+| 304    |   71 |   28 | 17                   | LIT_INTEIRO                | 17                   |
+| 305    |   71 |   31 | %                    | OP_RESTO                   | -                    |
+| 306    |   71 |   33 | 5                    | LIT_INTEIRO                | 5                    |
+| 307    |   71 |   34 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 308    |   72 |    3 | var                  | PR_VAR                     | -                    |
+| 309    |   72 |    7 | matriz               | IDENTIFICADOR              | matriz               |
+| 310    |   72 |   16 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 311    |   72 |   18 | inteiro              | PR_INTEIRO                 | -                    |
+| 312    |   72 |   26 | =                    | OP_ATRIBUI                 | -                    |
+| 313    |   72 |   28 | dados                | IDENTIFICADOR              | dados                |
+| 314    |   72 |   33 | [                    | DEL_ABRE_COL               | -                    |
+| 315    |   72 |   34 | 3                    | LIT_INTEIRO                | 3                    |
+| 316    |   72 |   35 | ]                    | DEL_FECHA_COL              | -                    |
+| 317    |   72 |   36 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 318    |   73 |    3 | var                  | PR_VAR                     | -                    |
+| 319    |   73 |    7 | campo                | IDENTIFICADOR              | campo                |
+| 320    |   73 |   16 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 321    |   73 |   18 | real                 | PR_REAL                    | -                    |
+| 322    |   73 |   23 | =                    | OP_ATRIBUI                 | -                    |
+| 323    |   73 |   25 | sensor               | IDENTIFICADOR              | sensor               |
+| 324    |   73 |   31 | .                    | DEL_PONTO                  | -                    |
+| 325    |   73 |   32 | calibracao           | IDENTIFICADOR              | calibracao           |
+| 326    |   73 |   42 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 327    |   75 |    3 | leia                 | PR_LEIA                    | -                    |
+| 328    |   75 |    7 | (                    | DEL_ABRE_PAR               | -                    |
+| 329    |   75 |    8 | leituras             | IDENTIFICADOR              | leituras             |
+| 330    |   75 |   16 | )                    | DEL_FECHA_PAR              | -                    |
+| 331    |   75 |   17 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 332    |   76 |    3 | retorne              | PR_RETORNE                 | -                    |
+| 333    |   76 |   11 | 0                    | LIT_INTEIRO                | 0                    |
+| 334    |   76 |   12 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 335    |   77 |    1 | }                    | DEL_FECHA_CHA              | -                    |
++--------+------+------+----------------------+----------------------------+----------------------+
+
+ERROS LEXICOS: nenhum.
+
+TABELA DE SIMBOLOS (30 identificadores distintos)
++--------+----------------------------+--------------------+------------+
+| ID     | NOME                       | 1a OCORRENCIA      | USOS       |
++--------+----------------------------+--------------------+------------+
+| 0      | MonitorDeVazao             | linha 6, col 10    | 1          |
+| 1      | MASCARA_SENSOR             | linha 14, col 11   | 2          |
+| 2      | BITS_ATIVOS                | linha 15, col 11   | 2          |
+| 3      | LIMITE                     | linha 16, col 11   | 2          |
+| 4      | GRAVIDADE                  | linha 17, col 11   | 2          |
+| 5      | EPSILON                    | linha 18, col 11   | 3          |
+| 6      | ESCALA                     | linha 19, col 11   | 1          |
+| 7      | leituras                   | linha 21, col 5    | 4          |
+| 8      | vazao                      | linha 22, col 5    | 9          |
+| 9      | etiqueta                   | linha 23, col 5    | 1          |
+| 10     | separador                  | linha 24, col 5    | 2          |
+| 11     | simbolo                    | linha 25, col 5    | 1          |
+| 12     | ativo                      | linha 26, col 5    | 2          |
+| 13     | desligado                  | linha 27, col 5    | 2          |
+| 14     | reserva                    | linha 28, col 5    | 1          |
+| 15     | media                      | linha 30, col 8    | 2          |
+| 16     | soma                       | linha 30, col 14   | 2          |
+| 17     | n                          | linha 30, col 26   | 3          |
+| 18     | classificar                | linha 37, col 8    | 2          |
+| 19     | v                          | linha 37, col 20   | 3          |
+| 20     | principal                  | linha 43, col 8    | 1          |
+| 21     | i                          | linha 46, col 8    | 2          |
+| 22     | registro                   | linha 53, col 7    | 7          |
+| 23     | potencia                   | linha 70, col 7    | 1          |
+| 24     | resto                      | linha 71, col 7    | 1          |
+| 25     | matriz                     | linha 72, col 7    | 1          |
+| 26     | dados                      | linha 72, col 28   | 1          |
+| 27     | campo                      | linha 73, col 7    | 1          |
+| 28     | sensor                     | linha 73, col 25   | 1          |
+| 29     | calibracao                 | linha 73, col 32   | 1          |
++--------+----------------------------+--------------------+------------+
+
+ESTATISTICAS
+--------------------------------------------------------------------------
+  Caracteres lidos.............: 2383
+  Tokens reconhecidos..........: 335
+    - PALAVRA_RESERVADA       :   68 ( 20.3%)
+    - IDENTIFICADOR           :   64 ( 19.1%)
+    - LITERAL                 :   37 ( 11.0%)
+    - OPERADOR                :   48 ( 14.3%)
+    - DELIMITADOR             :  118 ( 35.2%)
+  Identificadores distintos....: 30
+  Comentarios de linha.........: 8
+  Comentarios de bloco.........: 2
+  Erros lexicos................: 0
+  Tempo de varredura...........: 17.537 ms
+  Vazao........................: 19102 tokens/s
+--------------------------------------------------------------------------

@@ -1,0 +1,4 @@
+Benchmark: 20000 blocos, 5060000 caracteres.
+Tokens.......: 1240000
+Melhor tempo.: 210.7 ms
+Vazao........: 5884534 tokens/s | 22.9 MB/s

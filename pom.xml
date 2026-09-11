@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Caminho alternativo de build, para quem prefere Maven ao Makefile.
+
+  O plugin jflex-maven-plugin le as especificacoes em src/main/jflex/ (e
+  subdiretorios) e gera o codigo em target/generated-sources/jflex, ja no
+  pacote correspondente. Referencia:
+  https://jflex-de.github.io/jflex-web/jflex-maven-plugin/usage.html
+
+  Requer acesso ao Maven Central para baixar o plugin. Se a rede estiver
+  bloqueada, use "make" ou "./build.sh", que baixam apenas o jar do JFlex.
+
+  Comandos:
+    mvn -q compile
+    mvn -q exec:java -Dexec.mainClass=br.edu.cesupa.tucupi.Main \
+                     -Dexec.args="exemplos/01_valido.tcp"
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>br.edu.cesupa</groupId>
+  <artifactId>tucupi-lexer</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+
+  <name>Analisador Lexico Tucupi</name>
+  <description>Analisador lexico da mini-linguagem Tucupi, gerado com JFlex</description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <jflex.version>1.9.1</jflex.version>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>de.jflex</groupId>
+        <artifactId>jflex-maven-plugin</artifactId>
+        <version>${jflex.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

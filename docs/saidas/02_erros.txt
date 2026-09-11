@@ -1,0 +1,148 @@
+==========================================================================
+ ANALISADOR LEXICO TUCUPI -- gerado com JFlex 1.9.1
+ Arquivo: exemplos/02_erros.tcp
+==========================================================================
+
+TABELA DE TOKENS
++--------+------+------+----------------------+----------------------------+----------------------+
+| #      | LIN  | COL  | LEXEMA               | TOKEN                      | VALOR                |
++--------+------+------+----------------------+----------------------------+----------------------+
+| 1      |    9 |    1 | programa             | PR_PROGRAMA                | -                    |
+| 2      |    9 |   10 | DemonstracaoDeErros  | IDENTIFICADOR              | DemonstracaoDeErros  |
+| 3      |    9 |   29 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 4      |   12 |    1 | var                  | PR_VAR                     | -                    |
+| 5      |   12 |    5 | custo                | IDENTIFICADOR              | custo                |
+| 6      |   12 |   11 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 7      |   12 |   13 | real                 | PR_REAL                    | -                    |
+| 8      |   12 |   18 | =                    | OP_ATRIBUI                 | -                    |
+| 9      |   12 |   20 | 25                   | LIT_INTEIRO                | 25                   |
+| 10     |   12 |   23 | @                    | ERRO                       | -                    |
+| 11     |   12 |   25 | 3                    | LIT_INTEIRO                | 3                    |
+| 12     |   12 |   26 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 13     |   15 |    1 | var                  | PR_VAR                     | -                    |
+| 14     |   15 |    5 | 2vias                | ERRO                       | -                    |
+| 15     |   15 |   11 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 16     |   15 |   13 | inteiro              | PR_INTEIRO                 | -                    |
+| 17     |   15 |   21 | =                    | OP_ATRIBUI                 | -                    |
+| 18     |   15 |   23 | 0                    | LIT_INTEIRO                | 0                    |
+| 19     |   15 |   24 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 20     |   18 |    1 | var                  | PR_VAR                     | -                    |
+| 21     |   18 |    5 | enorme               | IDENTIFICADOR              | enorme               |
+| 22     |   18 |   12 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 23     |   18 |   14 | inteiro              | PR_INTEIRO                 | -                    |
+| 24     |   18 |   22 | =                    | OP_ATRIBUI                 | -                    |
+| 25     |   18 |   24 | 99999999999999       | LIT_INTEIRO                | 0                    |
+| 26     |   18 |   38 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 27     |   21 |    1 | var                  | PR_VAR                     | -                    |
+| 28     |   21 |    5 | mal_formado          | IDENTIFICADOR              | mal_formado          |
+| 29     |   21 |   17 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 30     |   21 |   19 | inteiro              | PR_INTEIRO                 | -                    |
+| 31     |   21 |   27 | =                    | OP_ATRIBUI                 | -                    |
+| 32     |   21 |   29 | 1_000_               | LIT_INTEIRO                | 1000                 |
+| 33     |   21 |   35 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 34     |   24 |    1 | var                  | PR_VAR                     | -                    |
+| 35     |   24 |    5 | vazio                | IDENTIFICADOR              | vazio                |
+| 36     |   24 |   11 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 37     |   24 |   13 | inteiro              | PR_INTEIRO                 | -                    |
+| 38     |   24 |   21 | =                    | OP_ATRIBUI                 | -                    |
+| 39     |   24 |   23 | 0x                   | ERRO                       | -                    |
+| 40     |   24 |   25 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 41     |   27 |    1 | var                  | PR_VAR                     | -                    |
+| 42     |   27 |    5 | msg1                 | IDENTIFICADOR              | msg1                 |
+| 43     |   27 |   10 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 44     |   27 |   12 | texto                | PR_TEXTO                   | -                    |
+| 45     |   27 |   18 | =                    | OP_ATRIBUI                 | -                    |
+| 46     |   27 |   20 | "quebra invalida q ~ | LIT_TEXTO                  | quebra invalida q a~ |
+| 47     |   27 |   45 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 48     |   30 |    1 | var                  | PR_VAR                     | -                    |
+| 49     |   30 |    5 | msg2                 | IDENTIFICADOR              | msg2                 |
+| 50     |   30 |   10 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 51     |   30 |   12 | texto                | PR_TEXTO                   | -                    |
+| 52     |   30 |   18 | =                    | OP_ATRIBUI                 | -                    |
+| 53     |   30 |   20 | "codigo \u12 trunca~ | LIT_TEXTO                  | codigo \u12 truncado |
+| 54     |   30 |   42 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 55     |   33 |    1 | var                  | PR_VAR                     | -                    |
+| 56     |   33 |    5 | msg3                 | IDENTIFICADOR              | msg3                 |
+| 57     |   33 |   10 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 58     |   33 |   12 | texto                | PR_TEXTO                   | -                    |
+| 59     |   33 |   18 | =                    | OP_ATRIBUI                 | -                    |
+| 60     |   33 |   20 | faltou fechar as as~ | ERRO                       | -                    |
+| 61     |   36 |    1 | var                  | PR_VAR                     | -                    |
+| 62     |   36 |    5 | c                    | IDENTIFICADOR              | c                    |
+| 63     |   36 |    7 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 64     |   36 |    9 | caractere            | PR_CARACTERE               | -                    |
+| 65     |   36 |   19 | =                    | OP_ATRIBUI                 | -                    |
+| 66     |   36 |   21 | 'abc'                | ERRO                       | -                    |
+| 67     |   36 |   26 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 68     |   39 |    1 | var                  | PR_VAR                     | -                    |
+| 69     |   39 |    5 | fim                  | IDENTIFICADOR              | fim                  |
+| 70     |   39 |    9 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 71     |   39 |   11 | inteiro              | PR_INTEIRO                 | -                    |
+| 72     |   39 |   19 | =                    | OP_ATRIBUI                 | -                    |
+| 73     |   39 |   21 | 1                    | LIT_INTEIRO                | 1                    |
+| 74     |   39 |   22 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 75     |   39 |   24 | */                   | ERRO                       | -                    |
+| 76     |   41 |    1 | escreva              | PR_ESCREVA                 | -                    |
+| 77     |   41 |    8 | (                    | DEL_ABRE_PAR               | -                    |
+| 78     |   41 |    9 | "o analisador chego~ | LIT_TEXTO                  | o analisador chegou~ |
+| 79     |   41 |   51 | )                    | DEL_FECHA_PAR              | -                    |
+| 80     |   41 |   52 | ;                    | DEL_PONTO_VIRGULA          | -                    |
++--------+------+------+----------------------+----------------------------+----------------------+
+
+ERROS LEXICOS (10)
+--------------------------------------------------------------------------
+  [linha 12, coluna 23] caractere invalido na linguagem
+      lexema: @
+  [linha 15, coluna 5] identificador nao pode comecar com digito
+      lexema: 2vias
+  [linha 18, coluna 24] literal inteiro fora da faixa de 32 bits com sinal
+      lexema: 99999999999999
+  [linha 21, coluna 29] separador "_" em posicao invalida no literal numerico
+      lexema: 1_000_
+  [linha 24, coluna 23] literal inteiro sem digitos apos o prefixo hexadecimal
+      lexema: 0x
+  [linha 27, coluna 37] sequencia de escape desconhecida
+      lexema: \q
+  [linha 30, coluna 28] escape unicode incompleto (esperados 4 digitos hexadecimais)
+      lexema: \u
+  [linha 33, coluna 20] literal de texto nao terminado antes do fim da linha
+      lexema: "faltou fechar as aspas
+  [linha 36, coluna 21] literal de caractere invalido
+      lexema: 'abc'
+  [linha 39, coluna 24] fechamento de comentario sem abertura correspondente
+      lexema: */
+--------------------------------------------------------------------------
+
+TABELA DE SIMBOLOS (10 identificadores distintos)
++--------+----------------------------+--------------------+------------+
+| ID     | NOME                       | 1a OCORRENCIA      | USOS       |
++--------+----------------------------+--------------------+------------+
+| 0      | DemonstracaoDeErros        | linha 9, col 10    | 1          |
+| 1      | custo                      | linha 12, col 5    | 1          |
+| 2      | enorme                     | linha 18, col 5    | 1          |
+| 3      | mal_formado                | linha 21, col 5    | 1          |
+| 4      | vazio                      | linha 24, col 5    | 1          |
+| 5      | msg1                       | linha 27, col 5    | 1          |
+| 6      | msg2                       | linha 30, col 5    | 1          |
+| 7      | msg3                       | linha 33, col 5    | 1          |
+| 8      | c                          | linha 36, col 5    | 1          |
+| 9      | fim                        | linha 39, col 5    | 1          |
++--------+----------------------------+--------------------+------------+
+
+ESTATISTICAS
+--------------------------------------------------------------------------
+  Caracteres lidos.............: 1365
+  Tokens reconhecidos..........: 80
+    - PALAVRA_RESERVADA       :   22 ( 27.5%)
+    - IDENTIFICADOR           :   10 ( 12.5%)
+    - LITERAL                 :    9 ( 11.3%)
+    - OPERADOR                :   10 ( 12.5%)
+    - DELIMITADOR             :   23 ( 28.8%)
+    - ESPECIAL                :    6 (  7.5%)
+  Identificadores distintos....: 10
+  Comentarios de linha.........: 17
+  Comentarios de bloco.........: 0
+  Erros lexicos................: 10
+  Tempo de varredura...........: 15.216 ms
+  Vazao........................: 5258 tokens/s
+--------------------------------------------------------------------------

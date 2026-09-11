@@ -1,0 +1,41 @@
+// ---------------------------------------------------------------------
+// 02_erros.tcp -- cada linha abaixo dispara um erro lexico diferente.
+//
+// O objetivo e mostrar a RECUPERACAO DE ERROS: o analisador nao aborta no
+// primeiro problema; ele registra a ocorrencia, continua a varredura e no
+// final lista todos os erros do arquivo em uma unica execucao.
+// ---------------------------------------------------------------------
+
+programa DemonstracaoDeErros;
+
+// 1) caractere que nao pertence ao alfabeto da linguagem
+var custo : real = 25 @ 3;
+
+// 2) identificador comecando com digito
+var 2vias : inteiro = 0;
+
+// 3) literal inteiro fora da faixa de 32 bits com sinal
+var enorme : inteiro = 99999999999999;
+
+// 4) separador "_" em posicao invalida
+var mal_formado : inteiro = 1_000_;
+
+// 5) prefixo de base sem digitos
+var vazio : inteiro = 0x;
+
+// 6) sequencia de escape desconhecida dentro de um texto
+var msg1 : texto = "quebra invalida \q aqui";
+
+// 7) escape unicode incompleto
+var msg2 : texto = "codigo \u12 truncado";
+
+// 8) literal de texto nao terminado antes do fim da linha
+var msg3 : texto = "faltou fechar as aspas
+
+// 9) literal de caractere invalido (mais de um caractere)
+var c : caractere = 'abc';
+
+// 10) fechamento de comentario sem abertura correspondente
+var fim : inteiro = 1; */
+
+escreva("o analisador chegou ate o fim do arquivo");

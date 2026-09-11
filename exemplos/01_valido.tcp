@@ -1,0 +1,77 @@
+// ---------------------------------------------------------------------
+// 01_valido.tcp -- exercita todas as classes de token da linguagem Tucupi
+// Nenhum erro lexico deve ser reportado neste arquivo.
+// ---------------------------------------------------------------------
+
+programa MonitorDeVazao;
+
+/* Constantes em varias bases numericas.
+   /* Este comentario esta ANINHADO dentro do anterior.
+      O JFlex nao aninha comentarios sozinho: usamos um estado lexico
+      exclusivo mais um contador de profundidade. */
+   O texto acima e ignorado pelo analisador. */
+
+constante MASCARA_SENSOR : inteiro = 0xFF00;
+constante BITS_ATIVOS    : inteiro = 0b1010_1100;
+constante LIMITE         : inteiro = 1_000_000;
+constante GRAVIDADE      : real    = 9.80665;
+constante EPSILON        : real    = 1.0e-9;
+constante ESCALA         : real    = 2.;
+
+var leituras   : inteiro = 0;
+var vazao      : real    = 0.0;
+var etiqueta   : texto   = "sensor \"P-01\"\tlinha 3\n";
+var separador  : caractere = '\n';
+var simbolo    : caractere = 'µ';
+var ativo      : logico  = verdadeiro;
+var desligado  : logico  = falso;
+var reserva              = nulo;
+
+funcao media(soma: real, n: inteiro) -> real {
+  se (n == 0) {
+    retorne 0.0;
+  }
+  retorne soma / n;
+}
+
+funcao classificar(v: real) -> texto {
+  se (v < 1.5)        { retorne "baixa";  }
+  senao se (v <= 4.0) { retorne "normal"; }
+  senao               { retorne "alta";   }
+}
+
+funcao principal() -> inteiro {
+  // Operador de intervalo: o casamento mais longo casaria "1." como real;
+  // yypushback(2) devolve os dois pontos ao fluxo de entrada.
+  para i = 1..10 passo 1 {
+    leituras += 1;
+    vazao = vazao + media(i * GRAVIDADE, leituras);
+  }
+
+  // Familia de operadores que demonstra o casamento mais longo:
+  // <  <=  <<  <<=  sao quatro tokens diferentes.
+  var registro : inteiro = BITS_ATIVOS << 2;
+  registro <<= 1;
+  registro >>= 1;
+  se (registro < LIMITE && registro <= MASCARA_SENSOR) {
+    registro = registro >> 3;
+  }
+
+  se (!desligado || ativo) {
+    escreva("vazao media = ", vazao, separador);
+    escreva(classificar(vazao));
+  }
+
+  enquanto (vazao > EPSILON) {
+    vazao *= 0.5;
+    se (vazao < EPSILON) { vazao = 0.0; }
+  }
+
+  var potencia : real = 2.0 ** 10;
+  var resto    : inteiro = 17 % 5;
+  var matriz   : inteiro = dados[3];
+  var campo    : real = sensor.calibracao;
+
+  leia(leituras);
+  retorne 0;
+}
