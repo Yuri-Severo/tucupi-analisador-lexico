@@ -1,0 +1,37 @@
+PROGRAMA Precedencia
+`-- FUNCAO principal -> inteiro  [ponto de entrada]
+    `-- BLOCO
+        |-- DECL_VAR r : inteiro
+        |   `-- SUBTRACAO -
+        |       |-- SOMA +
+        |       |   |-- LITERAL 1
+        |       |   `-- MULTIPLICACAO *
+        |       |       |-- LITERAL 2
+        |       |       `-- LITERAL 3
+        |       `-- DIVISAO /
+        |           |-- LITERAL 4
+        |           `-- LITERAL 2
+        |-- DECL_VAR p : real
+        |   `-- NEGATIVO -
+        |       `-- POTENCIA **
+        |           |-- LITERAL 2
+        |           `-- POTENCIA **
+        |               |-- LITERAL 3
+        |               `-- LITERAL 2
+        |-- DECL_VAR l : logico
+        |   `-- OU ||
+        |       |-- NAO !
+        |       |   `-- IDENT a
+        |       `-- E &&
+        |           |-- IDENT b
+        |           `-- IGUAL ==
+        |               |-- IDENT c
+        |               `-- IDENT d
+        |-- DECL_VAR g : inteiro
+        |   `-- MULTIPLICACAO *
+        |       |-- SOMA +
+        |       |   |-- LITERAL 1
+        |       |   `-- LITERAL 2
+        |       `-- LITERAL 3
+        `-- RETORNE
+            `-- LITERAL 0

@@ -1,0 +1,10 @@
+programa Para;
+funcao principal() -> inteiro {
+    var soma : inteiro = 0;
+    para i = 1..10 passo 2 {
+        soma += i << 1;
+        dados[i] = soma;
+        sensor.valor = dados[i] % 3;
+    }
+    retorne soma;
+}

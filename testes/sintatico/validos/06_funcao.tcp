@@ -1,0 +1,8 @@
+programa Funcoes;
+funcao area(base: real, altura: real) -> real {
+    retorne base * altura / 2.0;
+}
+funcao vazia() -> inteiro {
+    retorne;
+}
+funcao principal() -> inteiro { retorne 0; }

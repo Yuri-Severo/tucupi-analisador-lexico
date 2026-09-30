@@ -1,0 +1,552 @@
+\documentclass[conference,a4paper]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{cite}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\usepackage{url}
+\usepackage{microtype}
+\usepackage{balance}
+
+\definecolor{cinza}{gray}{0.40}
+\definecolor{fundo}{gray}{0.96}
+
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  columns=fullflexible,
+  keepspaces=true,
+  frame=single,
+  framerule=0.3pt,
+  rulecolor=\color{cinza},
+  backgroundcolor=\color{fundo},
+  xleftmargin=2pt, xrightmargin=2pt,
+  aboveskip=4pt, belowskip=4pt,
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=false,
+  postbreak=\mbox{\textcolor{cinza}{$\hookrightarrow$}\space},
+  literate={á}{{\'a}}1 {à}{{\`a}}1 {ã}{{\~a}}1 {â}{{\^a}}1
+           {é}{{\'e}}1 {ê}{{\^e}}1 {í}{{\'i}}1 {ó}{{\'o}}1
+           {õ}{{\~o}}1 {ô}{{\^o}}1 {ú}{{\'u}}1 {ç}{{\c c}}1
+           {Á}{{\'A}}1 {É}{{\'E}}1 {Ó}{{\'O}}1 {Ç}{{\c C}}1
+           {—}{{---}}1 {→}{{$\rightarrow$}}1
+}
+\lstdefinelanguage{Tucupi}{
+  morekeywords={programa,var,constante,inteiro,real,texto,caractere,logico,
+    se,senao,enquanto,para,passo,funcao,retorne,leia,escreva,nulo},
+  sensitive=true,
+  morecomment=[l]{//},
+  morestring=[b]"
+}
+\lstdefinestyle{tucupi}{language=Tucupi,keywordstyle=\bfseries,commentstyle=\itshape\color{cinza}}
+\lstdefinestyle{java}{language=Java,keywordstyle=\bfseries,commentstyle=\itshape\color{cinza}}
+\lstdefinestyle{saida}{basicstyle=\ttfamily\scriptsize}
+
+\renewcommand{\lstlistingname}{Listagem}
+\newcommand{\cod}[1]{\texttt{#1}}
+
+\begin{document}
+
+\title{Tucupi: Implementação de um Analisador Léxico com JFlex e de um Analisador Sintático por Descida Recursiva}
+
+\author{\IEEEauthorblockN{Jorge Vasconcelos, Lucas Salviano, Renan Abreu e Yuri Severo}
+\IEEEauthorblockA{Disciplina de Autômatos e Compiladores\\
+Centro Universitário do Pará (CESUPA)\\
+Belém, PA, Brasil}}
+
+\maketitle
+
+\begin{abstract}
+Este trabalho apresenta a evolução da Tucupi, uma linguagem imperativa experimental com palavras reservadas em português, desenvolvida na disciplina de Autômatos e Compiladores. Na etapa anterior foi construído o analisador léxico, gerado pelo JFlex~1.9.1. Nesta etapa, o analisador léxico foi mantido sem alterações e recebeu um analisador sintático escrito manualmente em Java pela técnica de descida recursiva, guiado por uma Gramática Livre de Contexto (GLC) LL(1) com 32 não terminais. O analisador sintático consome os tokens diretamente do scanner, constrói uma árvore sintática e, diante de uma entrada inválida, informa linha, coluna, token esperado, token encontrado e a produção em análise. O protótipo reconhece declarações, funções, condicionais, repetições, entrada e saída e expressões aritméticas e lógicas com dez níveis de precedência. Em 19 casos de teste automatizados (9 válidos e 10 inválidos), todos os resultados coincidiram com o esperado, inclusive a posição de cada erro. A análise semântica ainda não foi implementada.
+\end{abstract}
+
+\begin{IEEEkeywords}
+analisador léxico, analisador sintático, JFlex, descida recursiva, gramática livre de contexto, árvore sintática
+\end{IEEEkeywords}
+
+\section{Introdução}
+
+Um compilador costuma ser organizado em fases. As duas primeiras, a análise léxica e a análise sintática, formam a base do \emph{front-end}~\cite{aho2006}. A análise léxica lê caracteres e os agrupa em \emph{tokens}; a análise sintática verifica se a sequência de tokens obedece à estrutura da linguagem, descrita por uma gramática livre de contexto~\cite{chomsky1956}. Separar as duas fases simplifica cada uma: o analisador léxico trata de expressões regulares e autômatos finitos, enquanto o analisador sintático trata de produções e da estrutura hierárquica do programa.
+
+A Tucupi é uma mini-linguagem criada pelo grupo com fins didáticos. Na etapa anterior, o trabalho se restringia à análise léxica: um \emph{scanner} gerado pelo JFlex~\cite{jflexmanual} transformava o código-fonte em uma lista de tokens. Ferramentas como Flex e JFlex, comparadas por Barbosa \emph{et al.} no ensino de compiladores~\cite{barbosa2019}, cobrem apenas a fase léxica; a fase sintática precisa de outra solução. Nesta etapa ela foi escrita à mão, o que torna explícita a relação entre a gramática e o código. A etapa atual acrescenta, portanto, a análise sintática inicial:
+\begin{center}
+\small
+\begin{tabular}{@{}ll@{}}
+Etapa anterior: & fonte $\rightarrow$ \emph{lexer} $\rightarrow$ tokens\\
+Etapa atual: & fonte $\rightarrow$ \emph{lexer} $\rightarrow$ tokens $\rightarrow$ \emph{parser} $\rightarrow$ árvore
+\end{tabular}
+\end{center}
+
+As contribuições desta etapa são: (i)~a manutenção do scanner JFlex existente, sem alterações na especificação; (ii)~a definição de uma GLC para a Tucupi; (iii)~um analisador sintático manual por descida recursiva; (iv)~a integração entre scanner e parser; (v)~a construção e a impressão de uma árvore sintática; e (vi)~o diagnóstico de erros sintáticos com posição no código-fonte. Das duas formas de implementação possíveis, o uso de ferramentas geradoras e a programação pura, o protótipo combina ambas: o scanner é gerado pelo JFlex e o parser é programação pura em Java. O código, os exemplos e as saídas citadas neste artigo estão no repositório do projeto\footnote{\url{https://github.com/Yuri-Severo/tucupi-analisador-lexico}}.
+
+\section{A Linguagem Tucupi}
+
+A Tucupi é imperativa, tem palavras reservadas em português e cinco tipos primitivos: \cod{inteiro}, \cod{real}, \cod{texto}, \cod{caractere} e \cod{logico}. Um programa começa com \cod{programa Nome;}, segue com declarações globais e termina com uma lista de funções. Não há palavra reservada \cod{main}: o bloco de execução principal é a função chamada \cod{principal}, que o parser marca como ponto de entrada. A Tabela~\ref{tab:recursos} resume os recursos reconhecidos pelo analisador sintático final; todos os exemplos foram aceitos pelo protótipo.
+
+\begin{table}[t]
+\caption{Recursos da Tucupi reconhecidos pelo analisador sintático}
+\label{tab:recursos}
+\centering
+\footnotesize
+\begin{tabular}{@{}ll@{}}
+\toprule
+Recurso & Exemplo \\
+\midrule
+Declaração & \cod{var x : inteiro = 10;} \\
+Constante & \cod{constante LIMITE : inteiro = 100;} \\
+Função & \cod{funcao principal() -> inteiro} \\
+Condicional & \cod{se (...) \{ ... \} senao \{ ... \}} \\
+Repetição & \cod{enquanto (n > 0) \{ ... \}} \\
+Repetição com contador & \cod{para i = 1..10 passo 2 \{ ... \}} \\
+Aritmética & \cod{x + y * 2}, \cod{2.0 ** 10} \\
+Comparação e lógica & \cod{x > 10 \&\& ativo} \\
+Atribuição composta & \cod{soma += i << 1;} \\
+Chamada & \cod{dobro(dobro(3) + 1)} \\
+Índice e campo & \cod{dados[i]}, \cod{sensor.valor} \\
+Entrada e saída & \cod{leia(x);}~ \cod{escreva("ok");} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A Listagem~\ref{lst:demo} mostra o programa usado como exemplo ao longo do artigo e na demonstração. Ele contém uma declaração global, a função \cod{principal}, uma expressão aritmética com precedência, uma regra lógica dentro de um \cod{se}/\cod{senao} e um retorno. Os números de linha são os do arquivo \cod{exemplos/04\_sintatico\_valido.tcp}, cujas linhas 1 a 9 são comentários.
+
+\begin{lstlisting}[float=tb,style=tucupi,caption={Programa de exemplo (linhas 10--24 do arquivo)},label={lst:demo},numbers=left,firstnumber=10,numberstyle=\tiny\color{cinza},numbersep=4pt,xleftmargin=12pt]
+programa Demo;
+
+var limite : inteiro = 10;
+
+funcao principal() -> inteiro {
+    var x : inteiro = 5 + 2 * 3;
+
+    se (x > limite && x != 0) {
+        escreva("maior");
+    } senao {
+        escreva("menor");
+    }
+
+    retorne 0;
+}
+\end{lstlisting}
+
+\section{Análise Léxica}
+
+A análise léxica foi mantida da etapa anterior. Três conceitos orientam esta fase. O \emph{lexema} é a sequência de caracteres reconhecida (por exemplo, \cod{limite}). A \emph{classe} é a categoria à qual o lexema pertence (identificador). O \emph{token} é a unidade entregue ao parser e reúne o tipo, o lexema, o valor já convertido (quando existe) e a posição de início (linha e coluna).
+
+O scanner é descrito no arquivo \cod{tucupi.flex} por expressões regulares associadas a ações em Java. O JFlex converte essa especificação em um autômato finito determinístico e gera a classe \cod{TucupiLexer}; na especificação atual, o autômato minimizado tem 212 estados. As diretivas \cod{\%line} e \cod{\%column} fazem o JFlex acompanhar a posição de cada token, e \cod{\%unicode} estende o alfabeto a todo o Unicode~\cite{jflexmanual}. Para confirmar que a etapa léxica não mudou, o scanner foi gerado novamente com o JFlex~1.9.1: o arquivo resultante é idêntico ao versionado no repositório, e as saídas léxicas de referência continuam iguais.
+
+A enumeração \cod{TokenType} define 64 tipos de token: 19 palavras reservadas, 1 de identificador, 5 de literais, 27 operadores, 10 delimitadores e 2 especiais (\cod{EOF} e \cod{ERRO}). A Tabela~\ref{tab:tokens} mostra exemplos retirados da Listagem~\ref{lst:demo}.
+
+\begin{table}[t]
+\caption{Lexema, classe e token no programa de exemplo}
+\label{tab:tokens}
+\centering
+\footnotesize
+\begin{tabular}{@{}lll@{}}
+\toprule
+Lexema & Classe & Token \\
+\midrule
+\cod{var} & palavra reservada & \cod{PR\_VAR} \\
+\cod{limite} & identificador & \cod{IDENTIFICADOR} \\
+\cod{10} & literal inteiro & \cod{LIT\_INTEIRO} \\
+\cod{"maior"} & literal de texto & \cod{LIT\_TEXTO} \\
+\cod{+} & operador aritmético & \cod{OP\_MAIS} \\
+\cod{\&\&} & operador lógico & \cod{OP\_E\_LOGICO} \\
+\cod{;} & delimitador & \cod{DEL\_PONTO\_VIRGULA} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Os identificadores são reconhecidos pela regra
+\begin{lstlisting}
+Identificador = [:jletter:] [:jletterdigit:]*
+\end{lstlisting}
+em que as classes predefinidas \cod{[:jletter:]} e \cod{[:jletterdigit:]} correspondem aos métodos \cod{Character.isJavaIdentifierStart} e \cod{Character.isJavaIdentifierPart} do Java~\cite{jflexmanual}. Com \cod{\%unicode}, nomes como \cod{vazão\_média} e \cod{$\sigma$\_amostral} são identificadores válidos. As palavras reservadas aparecem antes dessa regra na especificação; como \cod{var} casa com as duas regras com o mesmo comprimento, o JFlex escolhe a que aparece primeiro.
+
+A saída da etapa léxica é a cadeia de tokens. A Listagem~\ref{lst:tokens} mostra a cadeia completa do programa de exemplo, na saída real da opção \cod{--tokens}, que agrupa os tokens pela linha do código-fonte em que começam (as quebras marcadas com $\hookrightarrow$ foram inseridas para caber na coluna). A tabela completa de lexemas e tokens, com linha, coluna e valor de cada um dos 57 tokens, é gerada por \cod{make tabela} e está em \cod{docs/saidas/lexico\_demo.txt}.
+
+\begin{lstlisting}[float=tb,style=saida,caption={Cadeia de tokens do programa de exemplo (saída real)},label={lst:tokens}]
+  10 | PR_PROGRAMA IDENTIFICADOR(Demo) DEL_PONTO_VIRGULA
+  12 | PR_VAR IDENTIFICADOR(limite) DEL_DOIS_PONTOS PR_INTEIRO OP_ATRIBUI LIT_INTEIRO(10) DEL_PONTO_VIRGULA
+  14 | PR_FUNCAO IDENTIFICADOR(principal) DEL_ABRE_PAR DEL_FECHA_PAR OP_SETA PR_INTEIRO DEL_ABRE_CHA
+  15 | PR_VAR IDENTIFICADOR(x) DEL_DOIS_PONTOS PR_INTEIRO OP_ATRIBUI LIT_INTEIRO(5) OP_MAIS LIT_INTEIRO(2) OP_VEZES LIT_INTEIRO(3) DEL_PONTO_VIRGULA
+  17 | PR_SE DEL_ABRE_PAR IDENTIFICADOR(x) OP_MAIOR IDENTIFICADOR(limite) OP_E_LOGICO IDENTIFICADOR(x) OP_DIFERENTE LIT_INTEIRO(0) DEL_FECHA_PAR DEL_ABRE_CHA
+  18 | PR_ESCREVA DEL_ABRE_PAR LIT_TEXTO("maior") DEL_FECHA_PAR DEL_PONTO_VIRGULA
+  19 | DEL_FECHA_CHA PR_SENAO DEL_ABRE_CHA
+  20 | PR_ESCREVA DEL_ABRE_PAR LIT_TEXTO("menor") DEL_FECHA_PAR DEL_PONTO_VIRGULA
+  21 | DEL_FECHA_CHA
+  23 | PR_RETORNE LIT_INTEIRO(0) DEL_PONTO_VIRGULA
+  24 | DEL_FECHA_CHA
+     | EOF   (57 tokens, 0 erro(s) léxico(s))
+\end{lstlisting}
+
+\section{Gramática Livre de Contexto}
+
+Uma GLC é formada por terminais, não terminais, um símbolo inicial e um conjunto de produções~\cite{chomsky1956}. Na Tucupi, os \emph{terminais} são exatamente os tipos de token produzidos pelo scanner, como \cod{"se"}, \cod{";"} e \cod{IDENTIFICADOR}; a gramática não usa nenhum símbolo que o lexer não reconheça. Os \emph{não terminais} são categorias estruturais, como \cod{bloco}, \cod{comando} e \cod{expressao}. O \emph{símbolo inicial} é \cod{programa}. Cada \emph{produção} indica como um não terminal pode ser escrito em função de terminais e de outros não terminais.
+
+A gramática completa está no arquivo \cod{docs/gramatica.ebnf}, em notação EBNF~\cite{iso14977}, e tem 32 não terminais. A Listagem~\ref{lst:glc} reproduz as produções centrais: \cod{[ ]} indica parte opcional, \cod{\{ \}} indica repetição e \cod{|} separa alternativas.
+
+\begin{lstlisting}[float=tb,basicstyle=\ttfamily\scriptsize,caption={Produções centrais da GLC (recorte de docs/gramatica.ebnf)},label={lst:glc}]
+programa     = "programa", IDENTIFICADOR, ";",
+               { declaracao }, { funcao }, EOF ;
+declaracao   = ( "var" | "constante" ), IDENTIFICADOR,
+               [ ":", tipo ], [ "=", expressao ], ";" ;
+funcao       = "funcao", IDENTIFICADOR,
+               "(", [ parametros ], ")",
+               "->", tipo, bloco ;
+bloco        = "{", { comando }, "}" ;
+comando      = declaracao | condicional
+             | enquanto | para
+             | leitura, ";" | escrita, ";"
+             | retorno, ";" | comandoIdent, ";" ;
+comandoIdent = IDENTIFICADOR,
+               ( "(", [ argumentos ], ")"
+               | { sufixo }, opAtribuicao, expressao ) ;
+condicional  = "se", "(", expressao, ")", bloco,
+               [ "senao", ( condicional | bloco ) ] ;
+\end{lstlisting}
+
+A gramática foi escrita para ser LL(1)~\cite{lewis1968,knuth1971}: em todo ponto de decisão, um único token de lookahead indica qual alternativa aplicar. Duas decisões de projeto garantem essa propriedade. Primeiro, atribuição e chamada de função começam com \cod{IDENTIFICADOR}; a regra \cod{comandoIdent} é a forma \emph{fatorada à esquerda} das duas, e o token seguinte (\cod{(} ou um operador de atribuição) decide o caminho. Segundo, o corpo de \cod{se} é sempre um bloco entre chaves, o que elimina a ambiguidade do ``senão pendente'': cada \cod{senao} pertence ao \cod{se} imediatamente anterior, e a construção \cod{senao se} surge da própria regra \cod{condicional}. A Tabela~\ref{tab:sintaxe} relaciona os recursos sintáticos às produções que os definem.
+
+\begin{table}[t]
+\caption{Recursos sintáticos, produções e exemplos}
+\label{tab:sintaxe}
+\centering
+\scriptsize
+\begin{tabular}{@{}lll@{}}
+\toprule
+Recurso & Produção & Exemplo \\
+\midrule
+Programa & \cod{programa} & \cod{programa Demo;} \\
+Declaração & \cod{declaracao} & \cod{var x : real;} \\
+Função & \cod{funcao} & \cod{funcao f() -> real} \\
+Bloco & \cod{bloco} & \cod{\{ ... \}} \\
+Condicional & \cod{condicional} & \cod{se (c) \{..\} senao \{..\}} \\
+Repetição & \cod{enquanto}, \cod{para} & \cod{enquanto (c) \{..\}} \\
+Atribuição & \cod{comandoIdent} & \cod{x += 1;} \\
+Chamada & \cod{comandoIdent} & \cod{dobro(y);} \\
+Entrada/saída & \cod{leitura}, \cod{escrita} & \cod{leia(x);} \\
+Expressão & \cod{expressao}\ldots\cod{primario} & \cod{5 + 2 * 3} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+As expressões ocupam um não terminal por nível de precedência, do menos para o mais prioritário:
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
+expressao    = expressaoOu ;
+expressaoOu  = expressaoE, { "||", expressaoE } ;
+expressaoE   = igualdade, { "&&", igualdade } ;
+igualdade    = relacional, { ("=="|"!="), relacional } ;
+relacional   = deslocamento,
+               { ("<"|"<="|">"|">="), deslocamento } ;
+deslocamento = soma, { ("<<"|">>"), soma } ;
+soma         = produto, { ("+"|"-"), produto } ;
+produto      = unario, { ("*"|"/"|"%"), unario } ;
+unario       = ("!"|"+"|"-"), unario | potencia ;
+potencia     = posfixo, [ "**", unario ] ;
+posfixo      = primario, { sufixo } ;
+\end{lstlisting}
+Como \cod{produto} fica abaixo de \cod{soma}, a multiplicação é agrupada antes da adição. A repetição \cod{\{ \}} substitui a recursão à esquerda, que um parser descendente não trata, e produz associatividade à esquerda (\cod{a - b - c} equivale a \cod{(a - b) - c}). A potência é a única regra recursiva à direita, o que a torna associativa à direita.
+
+\section{Analisador Sintático}
+
+O analisador sintático (\cod{AnalisadorSintatico.java}) foi implementado manualmente em Java pela técnica de \emph{descida recursiva}~\cite{aho2006,wirth1996}: cada não terminal da gramática corresponde a um método, e a pilha de chamadas do Java acompanha a derivação. Não foi usado nenhum gerador de parser. O analisador mantém um único token de \emph{lookahead}, isto é, o próximo token ainda não consumido, e decide qual produção aplicar olhando apenas para ele.
+
+Quatro métodos auxiliares traduzem a EBNF para o código: \cod{avancar()} consome o token atual e pede o próximo ao scanner; \cod{verificar(t)} testa o tipo do token atual sem consumi-lo; \cod{aceitar(t)} consome o token se ele for do tipo \cod{t}; e \cod{esperar(t)} exige um token do tipo \cod{t}. Com eles, um terminal da gramática vira uma chamada a \cod{esperar}, uma parte opcional \cod{[ X ]} vira um \cod{if}, uma repetição \cod{\{ X \}} vira um \cod{while} e uma alternativa vira um \cod{switch} sobre o token atual. A Listagem~\ref{lst:esperar} mostra o método \cod{esperar}, que concentra a detecção de erros.
+
+\begin{lstlisting}[float=tb,style=java,basicstyle=\ttfamily\scriptsize,caption={Método \cod{esperar} (código real)},label={lst:esperar}]
+private Token esperar(TokenType tipo, String mensagem) {
+    if (!verificar(tipo)) {
+        throw erro(mensagem, descrever(tipo));
+    }
+    Token t = atual;
+    if (tipo != TokenType.EOF) {
+        avancar();
+    }
+    return t;
+}
+\end{lstlisting}
+
+Os níveis binários de expressão compartilham um único esquema, \cod{X = Y \{ op Y \}}, implementado pelo método \cod{binario}. Ele recebe o método do nível seguinte e os operadores do nível atual; a cada operador encontrado, cria um nó cujo filho esquerdo é a árvore construída até então. Assim, cada nível tem um método de uma linha, por exemplo \cod{soma()} chama \cod{binario(this::produto, OP\_MAIS, OP\_MENOS)}, e a precedência resulta da ordem das chamadas.
+
+A Tabela~\ref{tab:rastro} rastreia a análise da linha 15 da Listagem~\ref{lst:demo}, \cod{var x : inteiro = 5 + 2 * 3;}, a partir do momento em que \cod{comando()} encontra o token \cod{PR\_VAR}. As etapas seguem o código do parser; os níveis intermediários entre \cod{expressao} e \cod{primario} foram abreviados com ``$\rightarrow\ldots\rightarrow$''.
+
+\begin{table*}[t]
+\caption{Rastreamento da linha 15 pelo parser}
+\label{tab:rastro}
+\centering
+\footnotesize
+\begin{tabular}{@{}lll@{}}
+\toprule
+Lookahead & Método & Ação \\
+\midrule
+\cod{PR\_VAR} & \cod{comando} & escolhe \cod{declaracao()} \\
+\cod{PR\_VAR}, \cod{x}, \cod{:} & \cod{declaracao} & consome \cod{var}, \cod{x}, \cod{:} \\
+\cod{PR\_INTEIRO} & \cod{tipo} & consome \cod{inteiro} \\
+\cod{OP\_ATRIBUI} & \cod{declaracao} & consome \cod{=}; chama \cod{expressao()} \\
+\cod{LIT\_INTEIRO(5)} & \cod{expressao}$\rightarrow\ldots\rightarrow$\cod{primario} & consome \cod{5}: \cod{LITERAL 5} \\
+\cod{OP\_MAIS} & \cod{produto} & não é \cod{* / \%}: devolve \cod{5} \\
+\cod{OP\_MAIS} & \cod{soma} & consome \cod{+}; chama \cod{produto()} \\
+\cod{LIT\_INTEIRO(2)} & \cod{primario} & consome \cod{2} \\
+\cod{OP\_VEZES} & \cod{produto} & consome \cod{*}; lê \cod{3} \\
+\cod{DEL\_PONTO\_VIRGULA} & \cod{produto} & cria \cod{MULTIPLICACAO(2, 3)} \\
+\cod{DEL\_PONTO\_VIRGULA} & \cod{soma} & cria \cod{SOMA(5, MULTIPLICACAO)} \\
+\cod{DEL\_PONTO\_VIRGULA} & \cod{declaracao} & \cod{esperar(;)}; cria \cod{DECL\_VAR} \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+Quando o token atual não serve para nenhuma alternativa, o analisador lança a exceção \cod{ErroSintatico}. Ela registra a mensagem, o token encontrado, o que era esperado, o último token aceito e a pilha de produções ativas (por exemplo, \cod{programa > funcao > bloco > comando > declaracao}). O último token aceito é informado porque, quando falta um \cod{;}, o erro só é percebido no token seguinte, que pode estar em outra linha. Nesta etapa o analisador para no primeiro erro sintático e não faz recuperação.
+
+\subsection{Decisões de implementação}
+
+Três decisões simplificaram a entrega. Primeiro, o parser foi escrito à mão em vez de gerado por uma ferramenta como o CUP, para que a correspondência entre cada produção e cada método ficasse explícita e o scanner JFlex pudesse ser reaproveitado sem adaptações. Segundo, a árvore usa uma única classe de nó genérica, evitando dezenas de classes de AST numa etapa que ainda não tem análise semântica. Terceiro, a demonstração e os testes funcionam sem acesso à internet: a interface de linha de comando (\cod{MainSintatico}) usa o scanner já gerado, e o alvo \cod{make demo} executa o caso válido e o inválido. A opção \cod{--tokens} mostra a cadeia de tokens antes da árvore, e a opção \cod{--ascii} desenha a árvore apenas com caracteres ASCII.
+
+\section{Integração entre Scanner e Parser}
+
+A Fig.~\ref{fig:arq} mostra a arquitetura. O JFlex trabalha sobre caracteres e produz tokens; o parser trabalha apenas sobre tokens e nunca lê o arquivo. O parser recebe o \cod{TucupiLexer} no construtor e, a cada chamada de \cod{avancar()}, pede o próximo token pelo método \cod{proximoToken()}, o mesmo que a etapa léxica já oferecia. Nenhuma regra léxica foi duplicada no parser. O trecho abaixo, retirado de \cod{MainSintatico.java}, é tudo o que a integração exige:
+\begin{lstlisting}[style=java]
+TucupiLexer lexer = new TucupiLexer(new StringReader(fonte));
+parser = new AnalisadorSintatico(lexer);
+raiz = parser.programa();
+\end{lstlisting}
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  caixa/.style={draw, rounded corners=2pt, minimum height=0.62cm, align=center, font=\footnotesize, inner sep=3pt},
+  seta/.style={-{Stealth[length=2.2mm]}, thick},
+  node distance=0.34cm]
+\node[caixa] (f) {Código\\fonte .tcp};
+\node[caixa, right=of f, fill=black!6] (l) {TucupiLexer\\(JFlex)};
+\node[caixa, right=of l] (t) {Token};
+\node[caixa, right=of t, fill=black!14] (p) {Analisador\\Sintatico};
+\node[caixa, below=0.9cm of p] (n) {NoSintatico\\(árvore)};
+\node[caixa, below=0.9cm of l] (e) {ErroSintatico\\(linha:coluna)};
+\draw[seta] (f) -- (l);
+\draw[seta] (l) -- (t);
+\draw[seta] (t) -- (p);
+\draw[seta] ([xshift=4mm]p.south) -- node[right, font=\scriptsize]{aceito} ([xshift=4mm]n.north);
+\coordinate (r) at ([xshift=-4mm,yshift=-0.4cm]p.south);
+\draw[seta] ([xshift=-4mm]p.south) -- (r) -| (e.north);
+\node[font=\scriptsize, above=-1pt] at (t |- r) {rejeitado};
+\end{tikzpicture}
+\caption{Arquitetura do protótipo: o parser pede um token por vez ao scanner e produz uma árvore ou um erro.}
+\label{fig:arq}
+\end{figure}
+
+As responsabilidades pelos erros ficam separadas. Erros léxicos, como um caractere fora do alfabeto ou um literal inteiro fora da faixa de 32 bits, continuam sendo registrados pelo scanner, que não interrompe a varredura. Erros sintáticos, como um \cod{;} ausente, são detectados pelo parser. Quando o scanner devolve um token \cod{ERRO}, o parser interrompe a análise nesse ponto, e a interface de linha de comando lista os erros léxicos registrados. No arquivo \cod{02\_erros.tcp} da etapa anterior, por exemplo, a análise para em 12:23, no caractere \cod{@}, que é um erro léxico. A Tabela~\ref{tab:erros} compara os dois tipos de erro com exemplos do repositório.
+
+\begin{table}[t]
+\caption{Erro léxico e erro sintático no protótipo}
+\label{tab:erros}
+\centering
+\scriptsize
+\begin{tabular}{@{}lll@{}}
+\toprule
+ & Erro léxico & Erro sintático \\
+\midrule
+Detectado por & \cod{TucupiLexer} & \cod{AnalisadorSintatico} \\
+Unidade analisada & caracteres & tokens \\
+Exemplo & \cod{25 @ 3} (12:23) & \cod{;} ausente (6:5) \\
+Arquivo & \cod{02\_erros.tcp} & \cod{05\_sintatico\_erro.tcp} \\
+Registro & \cod{ErroLexico} & \cod{ErroSintatico} \\
+Comportamento & scanner continua & parser para \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Árvore Sintática}
+
+Cada produção reconhecida gera um nó da classe \cod{NoSintatico}. Para não criar uma classe por construção da linguagem, todo nó tem apenas um \emph{tipo} (\cod{PROGRAMA}, \cod{SE}, \cod{SOMA}\ldots), um \emph{valor} opcional (nome, operador ou lexema) e uma lista de \emph{filhos}. Parênteses não geram nós, porque o agrupamento já está expresso na forma da árvore. A classe \cod{ImpressoraArvore} imprime o resultado no estilo do comando \cod{tree}.
+
+A Fig.~\ref{fig:arvore} é a saída real do protótipo para a Listagem~\ref{lst:demo}, obtida com a opção \cod{--ascii}. A declaração da linha 15 mostra a precedência: a \cod{MULTIPLICACAO} fica abaixo da \cod{SOMA}, ou seja, \cod{5 + 2 * 3} foi reconhecido como \cod{5 + (2 * 3)}. Na condição do \cod{se}, o operador \cod{\&\&} fica acima das comparações, por ter precedência menor.
+
+\begin{figure}[t]
+\centering
+\begin{lstlisting}[style=saida,frame=none,backgroundcolor=\color{white},breaklines=false]
+PROGRAMA Demo
+|-- DECL_VAR limite : inteiro
+|   `-- LITERAL 10
+`-- FUNCAO principal -> inteiro  [ponto de entrada]
+    `-- BLOCO
+        |-- DECL_VAR x : inteiro
+        |   `-- SOMA +
+        |       |-- LITERAL 5
+        |       `-- MULTIPLICACAO *
+        |           |-- LITERAL 2
+        |           `-- LITERAL 3
+        |-- SE
+        |   |-- CONDICAO
+        |   |   `-- E &&
+        |   |       |-- MAIOR >
+        |   |       |   |-- IDENT x
+        |   |       |   `-- IDENT limite
+        |   |       `-- DIFERENTE !=
+        |   |           |-- IDENT x
+        |   |           `-- LITERAL 0
+        |   |-- BLOCO
+        |   |   `-- ESCREVA
+        |   |       `-- LITERAL "maior"
+        |   `-- SENAO
+        |       `-- BLOCO
+        |           `-- ESCREVA
+        |               `-- LITERAL "menor"
+        `-- RETORNE
+            `-- LITERAL 0
+\end{lstlisting}
+\caption{Árvore sintática da Listagem~\ref{lst:demo} (saída real, 29 nós).}
+\label{fig:arvore}
+\end{figure}
+
+\section{Resultados e Avaliação}
+
+\subsection{Caso 1: programa válido}
+
+Para a Listagem~\ref{lst:demo}, o scanner produziu 57 tokens sem erros léxicos (Listagem~\ref{lst:tokens}), o parser consumiu os 57 tokens e construiu a árvore da Fig.~\ref{fig:arvore}, com 29 nós. O protótipo informou:
+\begin{lstlisting}[style=saida]
+Tokens consumidos pelo parser: 57
+Nós na árvore sintática.....: 29
+Ponto de entrada............: função principal, linha 14
+Resultado: ACEITO — a entrada pertence à linguagem gerada pela GLC.
+\end{lstlisting}
+Ou seja, análise léxica sem erros e análise sintática aceita.
+
+\subsection{Caso 2: programa inválido}
+
+O arquivo \cod{05\_sintatico\_erro.tcp} contém um programa sem o \cod{;} ao fim da declaração da linha 4, seguido por um \cod{se} na linha 6. A Listagem~\ref{lst:erro} traz a saída real.
+
+\begin{lstlisting}[float=tb,style=saida,basicstyle=\ttfamily\fontsize{6.4}{7.6}\selectfont,caption={Diagnóstico do caso inválido (saída real)},label={lst:erro},breaklines=false]
+Erro sintático em 6:5
+Mensagem..: falta ";" no fim da declaração
+Esperado..: DEL_PONTO_VIRGULA (";")
+Encontrado: PR_SE ("se")
+Após......: LIT_INTEIRO ("10") em 4:23
+Produções.: programa > funcao > bloco > comando > declaracao
+
+   4 |     var x : inteiro = 10
+     |                         ^ após este ponto
+     :
+   6 |     se (x > 2) {
+     |     ^ erro detectado aqui
+\end{lstlisting}
+
+Todos os lexemas do arquivo são válidos: o scanner reconheceu 33 tokens sem nenhum erro léxico, e por isso não havia motivo para rejeitar a entrada na primeira fase. O problema está na ordem dos tokens: a produção \cod{declaracao} exige \cod{";"} depois da expressão, mas o token seguinte é \cod{PR\_SE}. O parser só percebe a violação ao encontrar o \cod{se} (6:5) e, por isso, aponta também o último token aceito (\cod{10}, em 4:23), que é onde o \cod{;} deveria estar.
+
+\subsection{Casos de teste}
+
+O repositório inclui um executor de testes sem dependências externas (\cod{TestesSintaticos.java}, acionado por \cod{make testes}). Os casos válidos devem ser aceitos; no caso de precedência, a árvore impressa é comparada com uma árvore esperada gravada em arquivo. Os casos inválidos devem ser rejeitados exatamente na linha e coluna anotadas no próprio arquivo. A Tabela~\ref{tab:testes} resume a execução.
+
+\begin{table}[t]
+\caption{Casos de teste do analisador sintático}
+\label{tab:testes}
+\centering
+\footnotesize
+\begin{tabular}{@{}lll@{}}
+\toprule
+Caso & Esperado & Resultado \\
+\midrule
+Declaração simples & aceito & aceito \\
+Precedência (árvore) & aceito & aceito, árvore ok \\
+\cod{se} & aceito & aceito \\
+\cod{se}/\cod{senao se}/\cod{senao} & aceito & aceito \\
+\cod{enquanto} & aceito & aceito \\
+Funções & aceito & aceito \\
+Chamadas & aceito & aceito \\
+Só a função \cod{principal} & aceito & aceito \\
+\cod{para}, \cod{+=}, \cod{<<}, índice, campo & aceito & aceito \\
+\midrule
+\cod{;} ausente & erro em 5:5 & erro em 5:5 \\
+\cod{)} ausente & erro em 4:15 & erro em 4:15 \\
+\cod{\}} ausente & erro em 6:1 & erro em 6:1 \\
+\cod{1 + * 2} & erro em 4:27 & erro em 4:27 \\
+\cod{retorne 0 0;} & erro em 4:15 & erro em 4:15 \\
+\cod{senao} sem \cod{se} & erro em 4:5 & erro em 4:5 \\
+Declaração global após função & erro em 4:1 & erro em 4:1 \\
+Função sem \cod{-> tipo} & erro em 3:20 & erro em 3:20 \\
+Comparação como comando & erro em 4:7 & erro em 4:7 \\
+Arquivo sem \cod{programa Nome;} & erro em 2:1 & erro em 2:1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Resultados quantitativos}
+
+A Tabela~\ref{tab:metricas} reúne apenas valores medidos no código final. Além dos testes, os dois programas de exemplo da etapa léxica que não contêm erros também foram aceitos pelo parser: \cod{01\_valido.tcp} (335 tokens, árvore com 169 nós), que exercita \cod{para}, \cod{enquanto}, \cod{**}, \cod{<<} e atribuições compostas, e \cod{03\_unicode.tcp} (159 tokens, 64 nós), com identificadores acentuados.
+
+\begin{table}[t]
+\caption{Métricas do protótipo (medidas no código final)}
+\label{tab:metricas}
+\centering
+\footnotesize
+\begin{tabular}{@{}lr@{}}
+\toprule
+Métrica & Valor \\
+\midrule
+Tipos de token (\cod{TokenType}) & 64 \\
+Estados do AFD minimizado (JFlex) & 212 \\
+Não terminais da GLC & 32 \\
+Níveis de precedência de expressões & 10 \\
+Métodos de produção no parser & 30 \\
+Casos de teste válidos / inválidos & 9 / 10 \\
+Casos com resultado igual ao esperado & 19 de 19 \\
+Exemplos da etapa léxica aceitos pelo parser & 2 de 2 sem erros \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Limitações}
+
+O protótipo cobre apenas as duas primeiras fases de um compilador, e o escopo desta etapa tem limites claros:
+\begin{itemize}
+\item não há análise semântica: tipos, declaração antes do uso, compatibilidade do retorno e a existência da função \cod{principal} não são verificados (a ausência de \cod{principal} gera apenas um aviso);
+\item não há geração de código nem execução de programas;
+\item o parser para no primeiro erro sintático, sem recuperação;
+\item a palavra reservada \cod{ate} é reconhecida pelo scanner, mas a gramática usa apenas \cod{..} no \cod{para};
+\item acesso por índice e por campo é aceito nas expressões, mas a linguagem ainda não tem sintaxe para declarar vetores ou registros;
+\item os testes verificam aceitação, rejeição e posição do erro, mas não comparam todas as árvores, apenas a do caso de precedência.
+\end{itemize}
+
+\section{Conclusão}
+
+O protótipo da Tucupi passou a contemplar as duas primeiras fases clássicas de um compilador. O scanner gerado pelo JFlex foi mantido sem alterações e integrado, pelo método \cod{proximoToken()}, a um analisador sintático manual por descida recursiva. A GLC LL(1) define o subconjunto reconhecido e a precedência das expressões; o parser constrói uma árvore sintática que torna essa estrutura visível e, diante de uma entrada inválida, informa a posição do erro, o que era esperado e o que foi encontrado. Os 19 casos de teste e os exemplos das duas etapas apresentaram os resultados esperados.
+
+Como trabalhos futuros, ficam a análise semântica (tabela de símbolos com escopos e verificação de tipos), a recuperação de erros sintáticos, a expansão da gramática (vetores, registros e o uso de \cod{ate}), a interpretação dos programas e a geração de código intermediário.
+
+\balance
+\begin{thebibliography}{9}
+
+\bibitem{aho2006}
+A.~V. Aho, M.~S. Lam, R.~Sethi e J.~D. Ullman, \emph{Compilers: Principles, Techniques, and Tools}, 2nd~ed. Boston, MA, EUA: Addison-Wesley, 2006.
+
+\bibitem{chomsky1956}
+N.~Chomsky, ``Three models for the description of language,'' \emph{IRE Trans. Inf. Theory}, vol.~2, no.~3, pp.~113--124, 1956.
+
+\bibitem{lewis1968}
+P.~M. Lewis~II e R.~E. Stearns, ``Syntax-directed transduction,'' \emph{J. ACM}, vol.~15, no.~3, pp.~465--488, jul. 1968.
+
+\bibitem{knuth1971}
+D.~E. Knuth, ``Top-down syntax analysis,'' \emph{Acta Informatica}, vol.~1, pp.~79--110, 1971.
+
+\bibitem{wirth1996}
+N.~Wirth, \emph{Compiler Construction}. Harlow, Reino Unido: Addison-Wesley, 1996.
+
+\bibitem{iso14977}
+\emph{Information technology --- Syntactic metalanguage --- Extended BNF}, ISO/IEC 14977:1996, 1996.
+
+\bibitem{jflexmanual}
+JFlex, ``JFlex User's Manual,'' versão~1.9.1. [Online]. Disponível: \url{https://jflex.de/manual.html}
+
+\bibitem{barbosa2019}
+C.~Barbosa, R.~Bonidia e J.~Neto, ``Flex, JFlex e GALS: Ferramentas de apoio ao ensino de compiladores,'' em \emph{Anais do XXVII Workshop sobre Educação em Computação (WEI)}, Belém, 2019, pp.~176--187, doi: 10.5753/wei.2019.6628.
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,143 @@
+(* ==========================================================================
+   gramatica.ebnf -- Gramatica Livre de Contexto (GLC) da linguagem Tucupi
+   Disciplina: Automatos e Compiladores -- CESUPA
+
+   Notacao (EBNF, ISO/IEC 14977 simplificada):
+     =        definicao                  ,        concatenacao
+     |        alternativa                ;        fim da regra
+     [ ... ]  opcional (0 ou 1 vez)      { ... }  repeticao (0 ou mais vezes)
+     ( ... )  agrupamento                "..."    simbolo terminal (lexema)
+     MAIUSCULAS = terminal produzido pelo analisador lexico (classe de token)
+
+   Terminais: sao exatamente os tokens de TokenType.java produzidos pelo
+   TucupiLexer (JFlex). A gramatica nao introduz nenhum simbolo que o
+   analisador lexico nao reconheca.
+
+   Propriedades:
+     - LL(1): em todo ponto de decisao, um unico token de lookahead escolhe
+       a alternativa. Por isso cada nao-terminal vira um metodo Java no
+       AnalisadorSintatico (descida recursiva, sem retrocesso).
+     - Sem recursao a esquerda: operadores binarios usam repeticao { },
+       o que produz associatividade a esquerda na arvore.
+     - "**" e a unica regra recursiva a direita (associatividade a direita).
+     - Nao ha "senao pendente" (dangling else): o corpo do "se" e sempre
+       um bloco entre chaves, entao cada "senao" tem um unico dono.
+   ========================================================================== *)
+
+
+(* ---------------------------- estrutura geral --------------------------- *)
+
+programa      = "programa", IDENTIFICADOR, ";",
+                { declaracao },
+                { funcao },
+                EOF ;
+
+declaracao    = ( "var" | "constante" ), IDENTIFICADOR,
+                [ ":", tipo ],
+                [ "=", expressao ],
+                ";" ;
+
+tipo          = "inteiro" | "real" | "texto" | "caractere" | "logico" ;
+
+funcao        = "funcao", IDENTIFICADOR,
+                "(", [ parametros ], ")",
+                "->", tipo,
+                bloco ;
+                (* a funcao de nome "principal" e o ponto de entrada;
+                   nao ha palavra reservada "main" *)
+
+parametros    = parametro, { ",", parametro } ;
+
+parametro     = IDENTIFICADOR, ":", tipo ;
+
+bloco         = "{", { comando }, "}" ;
+
+
+(* -------------------------------- comandos ------------------------------ *)
+
+comando       = declaracao
+              | condicional
+              | enquanto
+              | para
+              | leitura, ";"
+              | escrita, ";"
+              | retorno, ";"
+              | comandoIdent, ";" ;
+
+(* Atribuicao e chamada comecam ambas com IDENTIFICADOR. A regra abaixo e a
+   forma FATORADA A ESQUERDA das duas, o que mantem a gramatica LL(1):
+     atribuicao = alvo, opAtribuicao, expressao ;
+     chamada    = IDENTIFICADOR, "(", [ argumentos ], ")" ;               *)
+comandoIdent  = IDENTIFICADOR,
+                ( "(", [ argumentos ], ")"
+                | { sufixo }, opAtribuicao, expressao ) ;
+
+opAtribuicao  = "=" | "+=" | "-=" | "*=" | "/=" | "%=" | "<<=" | ">>=" ;
+
+condicional   = "se", "(", expressao, ")", bloco,
+                [ "senao", ( condicional | bloco ) ] ;
+
+enquanto      = "enquanto", "(", expressao, ")", bloco ;
+
+para          = "para", IDENTIFICADOR, "=", expressao,
+                "..", expressao,
+                [ "passo", expressao ],
+                bloco ;
+
+leitura       = "leia", "(", alvo, { ",", alvo }, ")" ;
+
+escrita       = "escreva", "(", [ argumentos ], ")" ;
+
+retorno       = "retorne", [ expressao ] ;
+
+alvo          = IDENTIFICADOR, { sufixo } ;
+
+sufixo        = "[", expressao, "]"
+              | ".", IDENTIFICADOR ;
+
+argumentos    = expressao, { ",", expressao } ;
+
+
+(* ------------------------------ expressoes ------------------------------
+   Um nao-terminal por nivel de precedencia, do MENOS para o MAIS
+   prioritario. Quanto mais fundo o nivel, mais cedo o operador e agrupado. *)
+
+expressao     = expressaoOu ;
+
+expressaoOu   = expressaoE, { "||", expressaoE } ;
+
+expressaoE    = igualdade, { "&&", igualdade } ;
+
+igualdade     = relacional, { ( "==" | "!=" ), relacional } ;
+
+relacional    = deslocamento, { ( "<" | "<=" | ">" | ">=" ), deslocamento } ;
+
+deslocamento  = soma, { ( "<<" | ">>" ), soma } ;
+
+soma          = produto, { ( "+" | "-" ), produto } ;
+
+produto       = unario, { ( "*" | "/" | "%" ), unario } ;
+
+unario        = ( "!" | "+" | "-" ), unario
+              | potencia ;
+
+potencia      = posfixo, [ "**", unario ] ;
+                (* 2 ** 3 ** 2 = 2 ** (3 ** 2);  -2 ** 2 = -(2 ** 2) *)
+
+posfixo       = primario, { sufixo } ;
+
+primario      = literal
+              | "nulo"
+              | IDENTIFICADOR, [ "(", [ argumentos ], ")" ]   (* variavel ou chamada *)
+              | "(", expressao, ")" ;
+
+literal       = LIT_INTEIRO | LIT_REAL | LIT_TEXTO | LIT_CARACTERE | LIT_LOGICO ;
+
+
+(* ---------------------- fora do escopo desta etapa ----------------------
+   - Tokens reconhecidos pelo lexer mas ainda nao usados pela gramatica:
+     "ate" (o "para" usa "..", como nos exemplos da etapa lexica).
+     Acesso por indice "v[i]" e por campo "a.b" e aceito nas expressoes,
+     mas a linguagem ainda nao tem sintaxe para DECLARAR vetores/registros.
+   - Verificacoes semanticas (tipos, declaracao antes do uso, retorno
+     compativel, existencia de "principal") ficam para a proxima etapa.  *)

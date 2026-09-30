@@ -1,0 +1,3 @@
+programa SoPrincipal;
+funcao principal() -> inteiro {
+}

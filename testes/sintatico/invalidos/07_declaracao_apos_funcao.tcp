@@ -1,0 +1,4 @@
+// espera-erro: 4:1
+programa Erro;
+funcao principal() -> inteiro { retorne 0; }
+var tarde : inteiro = 1;

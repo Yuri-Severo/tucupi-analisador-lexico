@@ -1,0 +1,37 @@
+==========================================================================
+ ANALISADOR SINTÁTICO TUCUPI
+ Léxico: TucupiLexer (JFlex 1.9.1) | Sintático: descida recursiva LL(1)
+ Arquivo: exemplos/05_sintatico_erro.tcp
+==========================================================================
+
+TOKENS (etapa léxica — TucupiLexer)
+--------------------------------------------------------------------------
+   1 | PR_PROGRAMA IDENTIFICADOR(Erro) DEL_PONTO_VIRGULA
+   3 | PR_FUNCAO IDENTIFICADOR(principal) DEL_ABRE_PAR DEL_FECHA_PAR OP_SETA PR_INTEIRO DEL_ABRE_CHA
+   4 | PR_VAR IDENTIFICADOR(x) DEL_DOIS_PONTOS PR_INTEIRO OP_ATRIBUI LIT_INTEIRO(10)
+   6 | PR_SE DEL_ABRE_PAR IDENTIFICADOR(x) OP_MAIOR LIT_INTEIRO(2) DEL_FECHA_PAR DEL_ABRE_CHA
+   7 | PR_ESCREVA DEL_ABRE_PAR LIT_TEXTO("teste") DEL_FECHA_PAR DEL_PONTO_VIRGULA
+   8 | DEL_FECHA_CHA
+  10 | PR_RETORNE LIT_INTEIRO(0) DEL_PONTO_VIRGULA
+  11 | DEL_FECHA_CHA
+     | EOF   (33 tokens, 0 erro(s) léxico(s))
+
+ERRO SINTÁTICO
+--------------------------------------------------------------------------
+Erro sintático em 6:5
+Mensagem..: falta ";" no fim da declaração
+Esperado..: DEL_PONTO_VIRGULA (";")
+Encontrado: PR_SE ("se")
+Após......: LIT_INTEIRO ("10") em 4:23
+Produções.: programa > funcao > bloco > comando > declaracao
+
+   4 |     var x : inteiro = 10
+     |                         ^ após este ponto
+     :
+   6 |     se (x > 2) {
+     |     ^ erro detectado aqui
+
+--------------------------------------------------------------------------
+Tokens consumidos pelo parser: 16
+Resultado: REJEITADO — erro sintático em 6:5.
+==========================================================================

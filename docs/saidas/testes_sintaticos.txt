@@ -1,0 +1,24 @@
+== Casos válidos (devem ser ACEITOS) ==
+  [PASSOU] 01_declaracao_simples.tcp          aceito
+  [PASSOU] 02_precedencia.tcp                 aceito, árvore confere
+  [PASSOU] 03_se.tcp                          aceito
+  [PASSOU] 04_se_senao.tcp                    aceito
+  [PASSOU] 05_enquanto.tcp                    aceito
+  [PASSOU] 06_funcao.tcp                      aceito
+  [PASSOU] 07_chamada.tcp                     aceito
+  [PASSOU] 08_principal.tcp                   aceito
+  [PASSOU] 09_para_e_atribuicoes.tcp          aceito
+
+== Casos inválidos (devem ser REJEITADOS na posição indicada) ==
+  [PASSOU] 01_ponto_virgula_ausente.tcp       rejeitado em 5:5 -- esperado DEL_PONTO_VIRGULA (";")
+  [PASSOU] 02_fecha_parentese_ausente.tcp     rejeitado em 4:15 -- esperado DEL_FECHA_PAR (")")
+  [PASSOU] 03_fecha_chave_ausente.tcp         rejeitado em 6:1 -- esperado DEL_FECHA_CHA ("}")
+  [PASSOU] 04_expressao_incompleta.tcp        rejeitado em 4:27 -- esperado expressão (literal, identificador, "(", "!", "-" ou "+")
+  [PASSOU] 05_token_inesperado.tcp            rejeitado em 4:15 -- esperado DEL_PONTO_VIRGULA (";")
+  [PASSOU] 06_senao_sem_se.tcp                rejeitado em 4:5 -- esperado comando
+  [PASSOU] 07_declaracao_apos_funcao.tcp      rejeitado em 4:1 -- esperado PR_FUNCAO ("funcao") ou EOF
+  [PASSOU] 08_sem_tipo_de_retorno.tcp         rejeitado em 3:20 -- esperado OP_SETA ("->")
+  [PASSOU] 09_comparacao_como_comando.tcp     rejeitado em 4:7 -- esperado operador de atribuição (=, +=, -=, *=, /=, %=, <<=, >>=) ou "(" de chamada
+  [PASSOU] 10_sem_cabecalho.tcp               rejeitado em 2:1 -- esperado PR_PROGRAMA ("programa")
+
+Resumo: 19 passaram, 0 falharam.

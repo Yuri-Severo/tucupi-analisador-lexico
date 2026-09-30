@@ -1,0 +1,4 @@
+// espera-erro: 2:1
+funcao principal() -> inteiro {
+    retorne 0;
+}

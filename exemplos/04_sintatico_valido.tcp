@@ -1,0 +1,24 @@
+// ---------------------------------------------------------------------
+// 04_sintatico_valido.tcp -- caso ACEITO pelo analisador sintatico.
+// E o mesmo codigo mostrado nos slides da apresentacao.
+//
+// Cobre: programa, declaracao de variaveis, funcao principal, bloco,
+// expressao matematica com precedencia (5 + 2 * 3), regra logica,
+// comparacao, se/senao, chamada de escreva e retorno.
+// ---------------------------------------------------------------------
+
+programa Demo;
+
+var limite : inteiro = 10;
+
+funcao principal() -> inteiro {
+    var x : inteiro = 5 + 2 * 3;
+
+    se (x > limite && x != 0) {
+        escreva("maior");
+    } senao {
+        escreva("menor");
+    }
+
+    retorne 0;
+}

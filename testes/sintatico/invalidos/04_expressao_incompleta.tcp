@@ -1,0 +1,6 @@
+// espera-erro: 4:27
+programa Erro;
+funcao principal() -> inteiro {
+    var r : inteiro = 1 + * 2;
+    retorne 0;
+}

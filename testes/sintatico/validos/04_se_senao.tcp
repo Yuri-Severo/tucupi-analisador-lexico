@@ -1,0 +1,8 @@
+programa SeSenao;
+funcao principal() -> inteiro {
+    var v : real = 3.0;
+    se (v < 1.5) { escreva("baixa"); }
+    senao se (v <= 4.0) { escreva("normal"); }
+    senao { escreva("alta"); }
+    retorne 0;
+}

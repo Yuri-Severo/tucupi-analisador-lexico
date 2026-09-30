@@ -1,0 +1,59 @@
+==========================================================================
+ ANALISADOR SINTÁTICO TUCUPI
+ Léxico: TucupiLexer (JFlex 1.9.1) | Sintático: descida recursiva LL(1)
+ Arquivo: exemplos/04_sintatico_valido.tcp
+==========================================================================
+
+TOKENS (etapa léxica — TucupiLexer)
+--------------------------------------------------------------------------
+  10 | PR_PROGRAMA IDENTIFICADOR(Demo) DEL_PONTO_VIRGULA
+  12 | PR_VAR IDENTIFICADOR(limite) DEL_DOIS_PONTOS PR_INTEIRO OP_ATRIBUI LIT_INTEIRO(10) DEL_PONTO_VIRGULA
+  14 | PR_FUNCAO IDENTIFICADOR(principal) DEL_ABRE_PAR DEL_FECHA_PAR OP_SETA PR_INTEIRO DEL_ABRE_CHA
+  15 | PR_VAR IDENTIFICADOR(x) DEL_DOIS_PONTOS PR_INTEIRO OP_ATRIBUI LIT_INTEIRO(5) OP_MAIS LIT_INTEIRO(2) OP_VEZES LIT_INTEIRO(3) DEL_PONTO_VIRGULA
+  17 | PR_SE DEL_ABRE_PAR IDENTIFICADOR(x) OP_MAIOR IDENTIFICADOR(limite) OP_E_LOGICO IDENTIFICADOR(x) OP_DIFERENTE LIT_INTEIRO(0) DEL_FECHA_PAR DEL_ABRE_CHA
+  18 | PR_ESCREVA DEL_ABRE_PAR LIT_TEXTO("maior") DEL_FECHA_PAR DEL_PONTO_VIRGULA
+  19 | DEL_FECHA_CHA PR_SENAO DEL_ABRE_CHA
+  20 | PR_ESCREVA DEL_ABRE_PAR LIT_TEXTO("menor") DEL_FECHA_PAR DEL_PONTO_VIRGULA
+  21 | DEL_FECHA_CHA
+  23 | PR_RETORNE LIT_INTEIRO(0) DEL_PONTO_VIRGULA
+  24 | DEL_FECHA_CHA
+     | EOF   (57 tokens, 0 erro(s) léxico(s))
+
+ÁRVORE SINTÁTICA
+--------------------------------------------------------------------------
+PROGRAMA Demo
+├── DECL_VAR limite : inteiro
+│   └── LITERAL 10
+└── FUNCAO principal -> inteiro  [ponto de entrada]
+    └── BLOCO
+        ├── DECL_VAR x : inteiro
+        │   └── SOMA +
+        │       ├── LITERAL 5
+        │       └── MULTIPLICACAO *
+        │           ├── LITERAL 2
+        │           └── LITERAL 3
+        ├── SE
+        │   ├── CONDICAO
+        │   │   └── E &&
+        │   │       ├── MAIOR >
+        │   │       │   ├── IDENT x
+        │   │       │   └── IDENT limite
+        │   │       └── DIFERENTE !=
+        │   │           ├── IDENT x
+        │   │           └── LITERAL 0
+        │   ├── BLOCO
+        │   │   └── ESCREVA
+        │   │       └── LITERAL "maior"
+        │   └── SENAO
+        │       └── BLOCO
+        │           └── ESCREVA
+        │               └── LITERAL "menor"
+        └── RETORNE
+            └── LITERAL 0
+
+--------------------------------------------------------------------------
+Tokens consumidos pelo parser: 57
+Nós na árvore sintática.....: 29
+Ponto de entrada............: função principal, linha 14
+Resultado: ACEITO — a entrada pertence à linguagem gerada pela GLC.
+==========================================================================

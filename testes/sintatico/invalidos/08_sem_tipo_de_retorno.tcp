@@ -1,0 +1,5 @@
+// espera-erro: 3:20
+programa Erro;
+funcao principal() {
+    retorne 0;
+}

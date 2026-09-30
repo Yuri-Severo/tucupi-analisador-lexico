@@ -1,0 +1,5 @@
+// espera-erro: 4:5
+programa Erro;
+funcao principal() -> inteiro {
+    senao { retorne 1; }
+}

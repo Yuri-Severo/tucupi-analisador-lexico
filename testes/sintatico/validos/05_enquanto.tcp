@@ -1,0 +1,8 @@
+programa Enquanto;
+funcao principal() -> inteiro {
+    var n : inteiro = 10;
+    enquanto (n > 0 && n != 3) {
+        n -= 1;
+    }
+    retorne n;
+}

@@ -1,0 +1,6 @@
+programa Se;
+funcao principal() -> inteiro {
+    var x : inteiro = 5;
+    se (x >= 5) { x = x - 1; }
+    retorne x;
+}

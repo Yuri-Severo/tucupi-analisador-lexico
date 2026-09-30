@@ -1,0 +1,5 @@
+// espera-erro: 6:1
+programa Erro;
+funcao principal() -> inteiro {
+    se (x > 2) { escreva("teste"); }
+    retorne 0;

@@ -1,0 +1,11 @@
+programa Erro;
+
+funcao principal() -> inteiro {
+    var x : inteiro = 10
+
+    se (x > 2) {
+        escreva("teste");
+    }
+
+    retorne 0;
+}

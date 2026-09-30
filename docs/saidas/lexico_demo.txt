@@ -1,0 +1,96 @@
+==========================================================================
+ ANALISADOR LEXICO TUCUPI -- gerado com JFlex 1.9.1
+ Arquivo: exemplos/04_sintatico_valido.tcp
+==========================================================================
+
+TABELA DE TOKENS
++--------+------+------+----------------------+----------------------------+----------------------+
+| #      | LIN  | COL  | LEXEMA               | TOKEN                      | VALOR                |
++--------+------+------+----------------------+----------------------------+----------------------+
+| 1      |   10 |    1 | programa             | PR_PROGRAMA                | -                    |
+| 2      |   10 |   10 | Demo                 | IDENTIFICADOR              | Demo                 |
+| 3      |   10 |   14 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 4      |   12 |    1 | var                  | PR_VAR                     | -                    |
+| 5      |   12 |    5 | limite               | IDENTIFICADOR              | limite               |
+| 6      |   12 |   12 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 7      |   12 |   14 | inteiro              | PR_INTEIRO                 | -                    |
+| 8      |   12 |   22 | =                    | OP_ATRIBUI                 | -                    |
+| 9      |   12 |   24 | 10                   | LIT_INTEIRO                | 10                   |
+| 10     |   12 |   26 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 11     |   14 |    1 | funcao               | PR_FUNCAO                  | -                    |
+| 12     |   14 |    8 | principal            | IDENTIFICADOR              | principal            |
+| 13     |   14 |   17 | (                    | DEL_ABRE_PAR               | -                    |
+| 14     |   14 |   18 | )                    | DEL_FECHA_PAR              | -                    |
+| 15     |   14 |   20 | ->                   | OP_SETA                    | -                    |
+| 16     |   14 |   23 | inteiro              | PR_INTEIRO                 | -                    |
+| 17     |   14 |   31 | {                    | DEL_ABRE_CHA               | -                    |
+| 18     |   15 |    5 | var                  | PR_VAR                     | -                    |
+| 19     |   15 |    9 | x                    | IDENTIFICADOR              | x                    |
+| 20     |   15 |   11 | :                    | DEL_DOIS_PONTOS            | -                    |
+| 21     |   15 |   13 | inteiro              | PR_INTEIRO                 | -                    |
+| 22     |   15 |   21 | =                    | OP_ATRIBUI                 | -                    |
+| 23     |   15 |   23 | 5                    | LIT_INTEIRO                | 5                    |
+| 24     |   15 |   25 | +                    | OP_MAIS                    | -                    |
+| 25     |   15 |   27 | 2                    | LIT_INTEIRO                | 2                    |
+| 26     |   15 |   29 | *                    | OP_VEZES                   | -                    |
+| 27     |   15 |   31 | 3                    | LIT_INTEIRO                | 3                    |
+| 28     |   15 |   32 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 29     |   17 |    5 | se                   | PR_SE                      | -                    |
+| 30     |   17 |    8 | (                    | DEL_ABRE_PAR               | -                    |
+| 31     |   17 |    9 | x                    | IDENTIFICADOR              | x                    |
+| 32     |   17 |   11 | >                    | OP_MAIOR                   | -                    |
+| 33     |   17 |   13 | limite               | IDENTIFICADOR              | limite               |
+| 34     |   17 |   20 | &&                   | OP_E_LOGICO                | -                    |
+| 35     |   17 |   23 | x                    | IDENTIFICADOR              | x                    |
+| 36     |   17 |   25 | !=                   | OP_DIFERENTE               | -                    |
+| 37     |   17 |   28 | 0                    | LIT_INTEIRO                | 0                    |
+| 38     |   17 |   29 | )                    | DEL_FECHA_PAR              | -                    |
+| 39     |   17 |   31 | {                    | DEL_ABRE_CHA               | -                    |
+| 40     |   18 |    9 | escreva              | PR_ESCREVA                 | -                    |
+| 41     |   18 |   16 | (                    | DEL_ABRE_PAR               | -                    |
+| 42     |   18 |   17 | "maior"              | LIT_TEXTO                  | maior                |
+| 43     |   18 |   24 | )                    | DEL_FECHA_PAR              | -                    |
+| 44     |   18 |   25 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 45     |   19 |    5 | }                    | DEL_FECHA_CHA              | -                    |
+| 46     |   19 |    7 | senao                | PR_SENAO                   | -                    |
+| 47     |   19 |   13 | {                    | DEL_ABRE_CHA               | -                    |
+| 48     |   20 |    9 | escreva              | PR_ESCREVA                 | -                    |
+| 49     |   20 |   16 | (                    | DEL_ABRE_PAR               | -                    |
+| 50     |   20 |   17 | "menor"              | LIT_TEXTO                  | menor                |
+| 51     |   20 |   24 | )                    | DEL_FECHA_PAR              | -                    |
+| 52     |   20 |   25 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 53     |   21 |    5 | }                    | DEL_FECHA_CHA              | -                    |
+| 54     |   23 |    5 | retorne              | PR_RETORNE                 | -                    |
+| 55     |   23 |   13 | 0                    | LIT_INTEIRO                | 0                    |
+| 56     |   23 |   14 | ;                    | DEL_PONTO_VIRGULA          | -                    |
+| 57     |   24 |    1 | }                    | DEL_FECHA_CHA              | -                    |
++--------+------+------+----------------------+----------------------------+----------------------+
+
+ERROS LEXICOS: nenhum.
+
+TABELA DE SIMBOLOS (4 identificadores distintos)
++--------+----------------------------+--------------------+------------+
+| ID     | NOME                       | 1a OCORRENCIA      | USOS       |
++--------+----------------------------+--------------------+------------+
+| 0      | Demo                       | linha 10, col 10   | 1          |
+| 1      | limite                     | linha 12, col 5    | 2          |
+| 2      | principal                  | linha 14, col 8    | 1          |
+| 3      | x                          | linha 15, col 9    | 3          |
++--------+----------------------------+--------------------+------------+
+
+ESTATISTICAS
+--------------------------------------------------------------------------
+  Caracteres lidos.............: 700
+  Tokens reconhecidos..........: 57
+    - PALAVRA_RESERVADA       :   12 ( 21.1%)
+    - IDENTIFICADOR           :    7 ( 12.3%)
+    - LITERAL                 :    8 ( 14.0%)
+    - OPERADOR                :    8 ( 14.0%)
+    - DELIMITADOR             :   22 ( 38.6%)
+  Identificadores distintos....: 4
+  Comentarios de linha.........: 8
+  Comentarios de bloco.........: 0
+  Erros lexicos................: 0
+  Tempo de varredura...........: 15.289 ms
+  Vazao........................: 3728 tokens/s
+--------------------------------------------------------------------------

@@ -1,0 +1,6 @@
+programa Declaracoes;
+var a : inteiro;
+var b : real = 1.5;
+constante LIMITE : inteiro = 100;
+var sem_tipo = nulo;
+funcao principal() -> inteiro { retorne 0; }

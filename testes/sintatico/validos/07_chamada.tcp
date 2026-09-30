@@ -1,0 +1,9 @@
+programa Chamadas;
+funcao dobro(x: inteiro) -> inteiro { retorne x * 2; }
+funcao principal() -> inteiro {
+    var y : inteiro = dobro(dobro(3) + 1);
+    dobro(y);
+    escreva("y = ", y, '\n');
+    leia(y);
+    retorne 0;
+}

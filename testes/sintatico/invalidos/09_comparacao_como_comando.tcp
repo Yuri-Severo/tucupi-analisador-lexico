@@ -1,0 +1,6 @@
+// espera-erro: 4:7
+programa Erro;
+funcao principal() -> inteiro {
+    x == 1;
+    retorne 0;
+}

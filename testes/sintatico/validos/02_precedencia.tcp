@@ -1,0 +1,8 @@
+programa Precedencia;
+funcao principal() -> inteiro {
+    var r : inteiro = 1 + 2 * 3 - 4 / 2;
+    var p : real = -2 ** 3 ** 2;
+    var l : logico = !a || b && c == d;
+    var g : inteiro = (1 + 2) * 3;
+    retorne 0;
+}
